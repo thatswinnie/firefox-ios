@@ -919,6 +919,7 @@ workflows:
         - connection: 'off'
         - itunescon_user: "$APPLE_ACCOUNT_ID"
         title: 'Nightly FirefoxBeta: Xcode Archive & Export for iOS'
+    - deploy-to-bitrise-io@1.9: {}
     envs:
     - opts:
         is_expand: false
