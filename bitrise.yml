@@ -266,13 +266,17 @@ workflows:
                 echo "$BITRISE_ARTIFACT_PATHS"
 
                 echo "$BITRISE_DEPLOY_DIR"
+                ls "$BITRISE_DEPLOY_DIR"
                 
                 echo "$BITRISE_SOURCE_DIR"
+                ls "$BITRISE_SOURCE_DIR"
+
+                TEST_DIR="/Users/vagrant/git/TestResults.zip"
 
                 MYDIR=`pwd`/tmp/Users/vagrant/git/xcodebuild.xcresult
                 i=1
                 IFS='|'
-                read -ra FILES <<< "$BITRISE_ARTIFACT_PATHS"
+                read -ra FILES <<< "$TEST_DIR"
                 for f in ${FILES[@]}
                 do
                   if [ "${f: -4}" = ".zip" ]; then
