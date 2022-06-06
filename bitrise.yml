@@ -254,9 +254,50 @@ workflows:
                 
                 cd "${BITRISE_DEPLOY_DIR}/"
                 exec zip -0 -qr "${BITRISE_SOURCE_DIR}/TestResults.zip" "/Users/vagrant/git/xcodebuild.xcresult"
-    - deploy-to-bitrise-io@2:
+    - script@1.1:
+          title: Deploy Artifacts
+          inputs:
+            - content: |
+                #!/usr/bin/env bash
+                set -euxo pipefail
+                
+                echo "==== MOVE FILES TO DEPLOY DIR ===="
+                echo "$BITRISE_ARTIFACT_PATHS"
+                
+                cd /tmp
+
+                MYDIR=`pwd`/tmp/Users/vagrant/git/xcodebuild.xcresult
+                i=1
+                IFS='|'
+                read -ra FILES <<< "$BITRISE_SOURCE_DIR"
+                for f in ${FILES[@]}
+                do
+                  if [ "${f: -4}" = ".zip" ]; then
+                    echo "Processing $f"
+            
+                    rm -rf tmp
+                    mkdir tmp
+                    unzip "$f" -d tmp
+                    
+                    echo "--Trainer--"
+                    mkdir "${BITRISE_TEST_RESULT_DIR}/test_${i}"
+                    trainer --path "${MYDIR}" --output_directory "${BITRISE_TEST_RESULT_DIR}/test_${i}" || : echo "{ \"test-name\": \"Tests ${i}\" }" > "${BITRISE_TEST_RESULT_DIR}/test_${i}/test-info.json"
+            
+                    ((i++))
+                  fi
+                done
+
+                cp "${BITRISE_TEST_RESULT_DIR}/test_1/xcodebuild.xml" "$BITRISE_SOURCE_DIR"
+                echo "look for file in source dir"
+                echo "$BITRISE_SOURCE_DIR"
+                ls
+                cd "$BITRISE_SOURCE_DIR"
+                ls
+    - custom-test-results-export@0:
         inputs:
-        - deploy_path: "${BITRISE_SOURCE_DIR}/TestResults.zip"
+        - search_pattern: "$BITRISE_SOURCE_DIR/xcodebuild.xml"
+        - test_name: Unit Test
+    - deploy-to-bitrise-io@2: {}
   1_git_clone_and_post_clone:
     steps:
     - activate-ssh-key@4:
