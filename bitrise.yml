@@ -267,7 +267,7 @@ workflows:
 
                 echo "$BITRISE_DEPLOY_DIR"
                 
-                echo "$BITRISE_SOURCE_DIR
+                echo "$BITRISE_SOURCE_DIR"
 
                 MYDIR=`pwd`/tmp/Users/vagrant/git/xcodebuild.xcresult
                 i=1
