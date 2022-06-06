@@ -252,10 +252,9 @@ workflows:
                 
                 cd "${BITRISE_DEPLOY_DIR}/"
                 exec zip -0 -qr "${BITRISE_SOURCE_DIR}/TestResults.zip" "/Users/vagrant/git/xcodebuild.xcresult"
-
-                echo "inside deploy dir"
-                pwd
-                ls
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: "${BITRISE_SOURCE_DIR}/TestResults.zip"
     - script@1.1:
           title: Deploy Artifacts
           inputs:
@@ -267,13 +266,13 @@ workflows:
                 echo "$BITRISE_ARTIFACT_PATHS"
 
                 echo "$BITRISE_DEPLOY_DIR"
-                cd "${BITRISE_DEPLOY_DIR}/"
-                ls
+                
+                echo "$BITRISE_SOURCE_DIR
 
                 MYDIR=`pwd`/tmp/Users/vagrant/git/xcodebuild.xcresult
                 i=1
                 IFS='|'
-                read -ra FILES <<< "$BITRISE_DEPLOY_DIR"
+                read -ra FILES <<< "$BITRISE_ARTIFACT_PATHS"
                 for f in ${FILES[@]}
                 do
                   if [ "${f: -4}" = ".zip" ]; then
