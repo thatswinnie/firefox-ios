@@ -37,8 +37,6 @@ workflows:
                 
                 echo "==== MOVE FILES TO DEPLOY DIR ===="
                 echo "$BITRISE_ARTIFACT_PATHS"
-                
-                cd /tmp
 
                 MYDIR=`pwd`/tmp/Users/vagrant/git/xcodebuild.xcresult
                 i=1
@@ -254,6 +252,10 @@ workflows:
                 
                 cd "${BITRISE_DEPLOY_DIR}/"
                 exec zip -0 -qr "${BITRISE_SOURCE_DIR}/TestResults.zip" "/Users/vagrant/git/xcodebuild.xcresult"
+
+                echo "inside deploy dir"
+                pwd
+                ls
     - script@1.1:
           title: Deploy Artifacts
           inputs:
@@ -265,8 +267,8 @@ workflows:
                 echo "$BITRISE_ARTIFACT_PATHS"
 
                 echo "$BITRISE_DEPLOY_DIR"
-                
-                cd /tmp
+                cd "${BITRISE_DEPLOY_DIR}/"
+                ls
 
                 MYDIR=`pwd`/tmp/Users/vagrant/git/xcodebuild.xcresult
                 i=1
