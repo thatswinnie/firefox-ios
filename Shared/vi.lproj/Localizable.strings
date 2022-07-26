@@ -2174,7 +2174,7 @@
 "Sync.SyncingEllipsis.Label" = "Đang đồng bộ hóa…";
 
 /* Panel accessibility label */
-"Synced Tabs" = "Các thẻ đã đồng bộ";
+"Synced Tabs" = "Thẻ đã đồng bộ hóa";
 
 /* The Bookmark sync component, used in SyncState.Partial.Title */
 "SyncState.Bookmark.Title" = "Dấu trang";
@@ -2225,7 +2225,7 @@
 "Tabs.Search.PlaceholderText" = "Tìm kiếm thẻ";
 
 /* Accessibility title for the inactive tabs section button when section is closed. This section groups all tabs that haven't been used in a while. */
-"TabsTray.InactiveTabs.SectionTitle.Closed.Accessibility.v103" = "Xem các thẻ không hoạt động";
+"TabsTray.InactiveTabs.SectionTitle.Closed.Accessibility.v103" = "Xem thẻ không hoạt động";
 
 /* Accessibility title for the inactive tabs section button when section is open. This section groups all tabs that haven't been used in a while. */
 "TabsTray.InactiveTabs.SectionTitle.Opened.Accessibility.v103" = "Ẩn các thẻ không hoạt động";
