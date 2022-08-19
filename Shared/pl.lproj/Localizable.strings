@@ -46,9 +46,6 @@
 /* On the Firefox homepage in the Jump Back In section, if a Tab group item - a collection of grouped tabs from a related search - exists underneath the search term for the tab group, there will be a subtitle with a number for how many tabs are in that group. The placeholder is for a number. It will read 'Tabs: 5' or similar. */
 "ActivityStream.JumpBackIn.TabGroup.SiteCount" = "Karty: %d";
 
-/* On the Firefox homepage in the Jump Back In section, if a Tab group item - a collection of grouped tabs from a related search - exists, the Tab Group item title will be 'Your search for \"video games\"'. The %@ sign is a placeholder for the actual search the user did. */
-"ActivityStream.JumpBackIn.TabGroup.Title" = "Wyszukiwanie „%@”";
-
 /* A string used to signify the start of the Recently Saved section in Home Screen. */
 "ActivityStream.Library.Title" = "Ostatnio zachowane";
 
@@ -296,9 +293,6 @@
 /* Contextual hints are little popups that appear for the users informing them of new features. This one introduces search bar placement to new users. It tells them that by default, the search bar will appear at the bottom of the device. */
 "ContextualHint.SearchBarPlacement.NewUsers" = "Aby ułatwić wpisywanie informacji, pasek narzędzi jest teraz domyślnie na dole.";
 
-/* Contextual hints are little popups that appear for the users informing them of new features. This one talks about the more personalized home feature. */
-"ContextualHints.Homepage.PersonalizedHome" = "Spersonalizowana strona startowa Firefoksa ułatwia teraz kontynuowanie od miejsca, w którym skończono. Znajdź swoje ostatnie karty, zakładki i wyniki wyszukiwania.";
-
 /* Contextual hints are little popups that appear for the users informing them of new features. This one is a call to action for the popup describing search bar placement. It indicates a user can navigate to the settings page that allows them to customize the placement of the search bar. */
 "ContextualHints.SearchBarPlacement.CallToAction" = "Ustawienia paska narzędzi";
 
@@ -468,6 +462,9 @@
 
 /* The title for the Sponsored Content context menu action for sponsored tiles in the Firefox home page shortcuts section. Clicking this brings the users to a support page where users can learn more about Sponsored content and how it works. */
 "FirefoxHomepage.ContextualMenu.SponsoredContent.v101" = "Nasi sponsorzy i Twoja prywatność";
+
+/* This string will show under the description on pocket story, indicating that the story is sponsored. */
+"FirefoxHomepage.Pocket.Sponsored.v103" = "Sponsorowane";
 
 /* This string will show under a shortcuts tile on the firefox home page, indicating that the tile is a sponsored tile. Space is limited, please keep as short as possible. */
 "FirefoxHomepage.Shortcuts.Sponsored.v100" = "Sponsorowane";
@@ -692,7 +689,7 @@
 "Hotkeys.NormalMode.DiscoveryTitle" = "Zwykłe przeglądanie";
 
 /* Label to switch to private browsing mode */
-"Hotkeys.PrivateMode.DiscoveryTitle" = "Przeglądanie prywatne";
+"Hotkeys.PrivateMode.DiscoveryTitle" = "Tryb prywatny";
 
 /* Label to display in the Discoverability overlay for keyboard shortcuts */
 "Hotkeys.Reload.DiscoveryTitle" = "Odśwież stronę";
@@ -1092,8 +1089,8 @@
 /* Label for the share button in the menu page. Pressing this button open the share menu to share the current website. */
 "Menu.Share.v99" = "Udostępnij";
 
-/* Label for the button, displayed in the menu, takes you to sync sign in when pressed. */
-"Menu.SignInToSync.Label.v99" = "Zaloguj się do synchronizacji";
+/* Label for the Firefox Sync button in the menu page. Pressing this button open the sign in to Firefox page service to sync and save data. */
+"Menu.SyncAndSaveData.v103" = "Synchronizuj i zachowuj dane";
 
 /* Toast displayed to the user after a tab has been sent successfully. */
 "Menu.TabSent.Confirm" = "Wysłano kartę";
@@ -1196,9 +1193,6 @@
 
 /* label for the menu item that lets you remove a website from the tracking protection whitelist */
 "Menu.TrackingProtectionWhitelistRemove.Title" = "Włącz na tej witrynie";
-
-/* The title for the option to view the What's new page. */
-"Menu.WhatsNew.Title" = "Co nowego";
 
 /* Accessibility label for Mobile Device image in remote tabs list */
 "mobile device" = "Urządzenie przenośne";
@@ -1415,7 +1409,7 @@
 /* Accessibility Label for the tab toolbar Search button
    Navigation title for search settings.
    Open search section of settings */
-"Search" = "Wyszukiwanie";
+"Search" = "Szukaj";
 
 /* The text shown in the URL bar on about:home */
 "Search or enter address" = "Wprowadź adres lub szukaj";
@@ -1625,9 +1619,6 @@
 /* Option choice in display theme settings for light theme */
 "Settings.DisplayTheme.OptionLight" = "Jasny";
 
-/* Display (theme) settings footer describing how the brightness slider works. */
-"Settings.DisplayTheme.SectionFooter" = "Motyw będzie automatycznie zmieniany na podstawie jasności ekranu. Można ustawić próg, po jakim to następuje. Kółko wskazuje obecną jasność ekranu.";
-
 /* Switch mode settings section title */
 "Settings.DisplayTheme.SwitchMode.SectionHeader" = "Tryb przełączania";
 
@@ -1691,6 +1682,9 @@
 
 /* In the settings menu, in the Firefox homepage customization section, this is the title for the option that allows users to toggle Shortcuts section on the Firefox homepage on or off */
 "Settings.Home.Option.Shortcuts" = "Skróty";
+
+/* In the settings menu, in the Firefox homepage customization section, this is the title for the option that allows users to turn the Pocket Sponsored Stories on the Firefox homepage on or off */
+"Settings.Home.Option.SponsoredPocket.v103" = "Sponsorowane artykuły";
 
 /* In the settings menu, on the Start at Home homepage customization option, this allows users to set this setting to return to the Homepage after four hours of inactivity. */
 "Settings.Home.Option.StartAtHome.AfterFourHours" = "Strona startowa po czterech godzinach bezczynności";
@@ -1878,6 +1872,18 @@
 /* Label used as an item in Settings. When touched it will open a dialog to configure the open with (mail links) behavior. */
 "Settings.OpenWith.SectionName" = "Aplikacja e-mail";
 
+/* Touch ID prompt subtitle when accessing logins and passwords */
+"Settings.Passwords.FingerPrintReason.v103" = "Użyj Touch ID, by uzyskać dostęp do haseł.";
+
+/* Message shown when you enter Passwords screen for the first time. It explains how password are protected in the Firefox for iOS application. */
+"Settings.Passwords.OnboardingMessage.v103" = "Hasła są teraz chronione przez Face ID, Touch ID lub kod urządzenia.";
+
+/* Setting that appears in the Passwords screen to enable the built-in password manager so users can save their passwords. */
+"Settings.Passwords.SavePasswords.v103" = "Zachowywanie haseł";
+
+/* Title for the passwords screen. */
+"Settings.Passwords.Title.v103" = "Hasła";
+
 /* Setting to enable the built-in password manager */
 "Settings.SaveLogins.Title" = "Zachowywanie danych logowania";
 
@@ -1943,6 +1949,15 @@
 
 /* Label used as a toggle item in Settings. When this is off, the user is opting out of all studies. */
 "Settings.Studies.Toggle.Title" = "Badania";
+
+/* Ddescription that appears in the settings screen to explain what Firefox Sync is useful for. */
+"Settings.Sync.ButtonDescription.v103" = "Zaloguj się i synchronizuj karty, zakładki, hasła i więcej.";
+
+/* Button label that appears in the settings to prompt the user to sign in to Firefox for iOS sync service to sync and save data. */
+"Settings.Sync.ButtonTitle.v103" = "Synchronizuj i zachowuj dane";
+
+/* Title for the page where the user sign in to their Firefox Sync account. */
+"Settings.Sync.SignInView.Title.v103" = "Synchronizuj i zachowuj dane";
 
 /* This is the description for the setting that toggles the Inactive Tabs feature in the settings menu under the Tabs customization section. Inactive tabs are a separate section of tabs that appears in the Tab Tray, which can be enabled or not */
 "Settings.Tabs.CustomizeTabsSection.InactiveTabs" = "Nieaktywne karty";
@@ -2123,7 +2138,7 @@
 "SwitchToNonPBM.KeyCodeTitle" = "Zwykłe przeglądanie";
 
 /* Hardware shortcut switch to the private browsing tab or tab tray. Shown in the Discoverability overlay when the hardware Command Key is held down. */
-"SwitchToPBM.KeyCodeTitle" = "Przeglądanie prywatne";
+"SwitchToPBM.KeyCodeTitle" = "Tryb prywatny";
 
 /* Text displayed when the Sync home panel is empty, describing the features provided by Sync to invite the user to log in. */
 "Sync your tabs, bookmarks, passwords and more." = "Synchronizuj karty, zakładki, hasła i inne";
@@ -2193,6 +2208,12 @@
 
 /* The placeholder text for the tab search bar */
 "Tabs.Search.PlaceholderText" = "Wyszukaj w kartach";
+
+/* Accessibility title for the inactive tabs section button when section is closed. This section groups all tabs that haven't been used in a while. */
+"TabsTray.InactiveTabs.SectionTitle.Closed.Accessibility.v103" = "Wyświetl nieaktywne karty";
+
+/* Accessibility title for the inactive tabs section button when section is open. This section groups all tabs that haven't been used in a while. */
+"TabsTray.InactiveTabs.SectionTitle.Opened.Accessibility.v103" = "Ukryj nieaktywne karty";
 
 /* Accessibility label for the Add Tab button in the Tab Tray. */
 "TabTray.AddTab.Button" = "Otwórz nową kartę";
