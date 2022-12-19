@@ -180,7 +180,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
     private func collectionViewSetup() {
         collectionView = UICollectionView(frame: .zero,
-                                          collectionViewLayout: UICollectionViewFlowLayout())
+                                          collectionViewLayout: getCompositionalLayout())
         collectionView.register(cellType: TabCell.self)
         collectionView.register(cellType: GroupedTabCell.self)
         collectionView.register(cellType: InactiveTabCell.self)
@@ -200,6 +200,114 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         collectionView.delegate = tabLayoutDelegate
 
         tabDisplayManager.tabDisplayCompletionDelegate = self
+    }
+
+    private func getCompositionalLayout() -> UICollectionViewCompositionalLayout {
+        let config = UICollectionViewCompositionalLayoutConfiguration()
+        config.scrollDirection = .vertical
+
+        let layout = UICollectionViewCompositionalLayout(sectionProvider: { sectionIndex, environment in
+            switch TabDisplaySection(rawValue: sectionIndex) {
+            case .inactiveTabs:
+                return self.inactiveTabSectionLayout()
+            case .groupedTabs:
+                return self.groupedTabSectionLayout()
+            case .regularTabs, .none:
+                return self.regularTabSectionLayout()
+            }
+        }, configuration: config)
+
+        return layout
+    }
+
+    private func inactiveTabSectionLayout() -> NSCollectionLayoutSection {
+        let frameWidth = collectionView.frame.size.width
+        var cellWidth = (frameWidth - GridTabTrayControllerUX.Margin * 2) > 0 ?
+            frameWidth - GridTabTrayControllerUX.Margin * 2 : 0
+        let estimatedHeight = InactiveTabCell.UX.HeaderAndRowHeight + InactiveTabCell.UX.RoundedContainerPaddingClosed
+
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            cellWidth = frameWidth/1.5
+        }
+
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .absolute(cellWidth),
+            heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .estimated(estimatedHeight))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                       subitems: [item])
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(
+            top: GridTabTrayControllerUX.Margin,
+            leading: GridTabTrayControllerUX.Margin,
+            bottom: GridTabTrayControllerUX.Margin,
+            trailing: GridTabTrayControllerUX.Margin)
+//        section.interGroupSpacing = GridTabTrayControllerUX.Margin
+        return section
+    }
+
+    private func groupedTabSectionLayout() -> NSCollectionLayoutSection {
+        let cellWidth = collectionView.frame.size.width > 0 ? collectionView.frame.size.width : 0
+        var cellHeight: CGFloat = 0
+
+        if let groupCount = tabDisplayManager.tabGroups?.count, groupCount > 0 {
+            cellHeight = GroupedTabCellProperties.CellUX.defaultCellHeight * CGFloat(groupCount) // WT: to check
+        }
+
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .absolute(cellWidth),
+            heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .absolute(cellHeight))
+        let subitemsCount = 1
+        let subItems: [NSCollectionLayoutItem] = Array(repeating: item, count: Int(subitemsCount))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                       subitems: subItems)
+//        group.interItemSpacing = .fixed(GridTabTrayControllerUX.Margin)
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(
+            top: GridTabTrayControllerUX.Margin,
+            leading: GridTabTrayControllerUX.Margin,
+            bottom: GridTabTrayControllerUX.Margin,
+            trailing: GridTabTrayControllerUX.Margin)
+//        section.interGroupSpacing = GridTabTrayControllerUX.Margin
+        return section
+    }
+
+    private func regularTabSectionLayout() -> NSCollectionLayoutSection {
+        let margin = GridTabTrayControllerUX.Margin * CGFloat(numberOfColumns + 1)
+        let calculatedWidth = collectionView.bounds.width - collectionView.safeAreaInsets.left - collectionView.safeAreaInsets.right - margin
+        let cellWidth = floor(calculatedWidth / CGFloat(numberOfColumns))
+        let cellHeight = tabLayoutDelegate.cellHeightForCurrentDevice()
+
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .absolute(cellWidth),
+            heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .absolute(cellHeight))
+        let subitemsCount = numberOfColumns
+        let subItems: [NSCollectionLayoutItem] = Array(repeating: item, count: Int(subitemsCount))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                       subitems: subItems)
+        group.interItemSpacing = .fixed(GridTabTrayControllerUX.Margin)
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(
+            top: GridTabTrayControllerUX.Margin,
+            leading: GridTabTrayControllerUX.Margin + collectionView.safeAreaInsets.left,
+            bottom: GridTabTrayControllerUX.Margin,
+            trailing: GridTabTrayControllerUX.Margin + collectionView.safeAreaInsets.right)
+        section.interGroupSpacing = GridTabTrayControllerUX.Margin
+        return section
     }
 
     private func tabManagerTeardown() {
