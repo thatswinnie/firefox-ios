@@ -16,7 +16,6 @@ struct GridTabTrayControllerUX {
     static let CloseButtonSize = CGFloat(32)
     static let CloseButtonMargin = CGFloat(6.0)
     static let CloseButtonEdgeInset = CGFloat(7)
-    static let NumberOfColumnsThin = 1
     static let NumberOfColumnsWide = 3
     static let CompactNumberOfColumnsThin = 2
     static let MenuFixedWidth: CGFloat = 320
