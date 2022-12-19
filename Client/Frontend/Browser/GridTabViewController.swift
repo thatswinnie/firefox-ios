@@ -99,30 +99,6 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         collectionViewSetup()
     }
 
-    private func collectionViewSetup() {
-        collectionView = UICollectionView(frame: .zero,
-                                          collectionViewLayout: UICollectionViewFlowLayout())
-        collectionView.register(cellType: TabCell.self)
-        collectionView.register(cellType: GroupedTabCell.self)
-        collectionView.register(cellType: InactiveTabCell.self)
-        collectionView.register(
-            LabelButtonHeaderView.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: GridTabViewController.independentTabsHeaderIdentifier)
-        tabDisplayManager = TabDisplayManager(collectionView: self.collectionView,
-                                              tabManager: self.tabManager,
-                                              tabDisplayer: self,
-                                              reuseID: TabCell.cellIdentifier,
-                                              tabDisplayType: .TabGrid,
-                                              profile: profile,
-                                              cfrDelegate: self,
-                                              theme: themeManager.currentTheme)
-        collectionView.dataSource = tabDisplayManager
-        collectionView.delegate = tabLayoutDelegate
-
-        tabDisplayManager.tabDisplayCompletionDelegate = self
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         tabManager.addDelegate(self)
@@ -154,6 +130,32 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         ])
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.view.layoutIfNeeded()
+        focusItem()
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        // When the app enters split screen mode we refresh the collection view layout to show the proper grid
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+
+    deinit {
+        tabManagerTeardown()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Private
     private func setupView() {
         // TODO: Remove SNAPKIT - this will require some work as the layouts
         // are using other snapkit constraints and this will require modification
@@ -177,21 +179,28 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         }
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.view.layoutIfNeeded()
-        focusItem()
-    }
+    private func collectionViewSetup() {
+        collectionView = UICollectionView(frame: .zero,
+                                          collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.register(cellType: TabCell.self)
+        collectionView.register(cellType: GroupedTabCell.self)
+        collectionView.register(cellType: InactiveTabCell.self)
+        collectionView.register(
+            LabelButtonHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: GridTabViewController.independentTabsHeaderIdentifier)
+        tabDisplayManager = TabDisplayManager(collectionView: self.collectionView,
+                                              tabManager: self.tabManager,
+                                              tabDisplayer: self,
+                                              reuseID: TabCell.cellIdentifier,
+                                              tabDisplayType: .TabGrid,
+                                              profile: profile,
+                                              cfrDelegate: self,
+                                              theme: themeManager.currentTheme)
+        collectionView.dataSource = tabDisplayManager
+        collectionView.delegate = tabLayoutDelegate
 
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        // When the app enters split screen mode we refresh the collection view layout to show the proper grid
-        collectionView.collectionViewLayout.invalidateLayout()
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        guard let flowlayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
-        flowlayout.invalidateLayout()
+        tabDisplayManager.tabDisplayCompletionDelegate = self
     }
 
     private func tabManagerTeardown() {
@@ -200,14 +209,6 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         tabDisplayManager = nil
         contextualHintViewController.stopTimer()
         notificationCenter.removeObserver(self)
-    }
-
-    deinit {
-        tabManagerTeardown()
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Scrolling helper methods
