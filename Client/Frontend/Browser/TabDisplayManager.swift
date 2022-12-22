@@ -523,18 +523,21 @@ extension TabDisplayManager: UICollectionViewDataSource {
         }
     }
 
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if tabGroups != nil,
-           let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
-                                                                      withReuseIdentifier: GridTabViewController.independentTabsHeaderIdentifier,
-                                                                      for: indexPath) as? LabelButtonHeaderView {
-            let viewModel = LabelButtonHeaderViewModel(leadingInset: 15,
-                                                       title: .TabTrayOtherTabsSectionHeader,
-                                                       titleA11yIdentifier: AccessibilityIdentifiers.TabTray.filteredTabs,
-                                                       isButtonHidden: true)
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath)
+    -> UICollectionReusableView {
+        if let view = collectionView.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: GridTabViewController.independentTabsHeaderIdentifier,
+            for: indexPath) as? LabelButtonHeaderView {
+            let viewModel = tabGroups == nil ? LabelButtonHeaderViewModel.emptyHeader : LabelButtonHeaderViewModel(
+                leadingInset: 0,
+                title: .TabTrayOtherTabsSectionHeader,
+                titleA11yIdentifier: AccessibilityIdentifiers.TabTray.filteredTabs,
+                isButtonHidden: true)
 
             view.configure(viewModel: viewModel, theme: theme)
-            view.title = .TabTrayOtherTabsSectionHeader
             view.titleLabel.font = .systemFont(ofSize: GroupedTabCellProperties.CellUX.titleFontSize, weight: .semibold)
 
             return view
