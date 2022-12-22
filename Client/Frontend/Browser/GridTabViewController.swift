@@ -188,6 +188,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
             LabelButtonHeaderView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: GridTabViewController.independentTabsHeaderIdentifier)
+
         tabDisplayManager = TabDisplayManager(collectionView: self.collectionView,
                                               tabManager: self.tabManager,
                                               tabDisplayer: self,
@@ -251,11 +252,13 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
     }
 
     private func groupedTabSectionLayout() -> NSCollectionLayoutSection {
-        let cellWidth = collectionView.frame.size.width > 0 ? collectionView.frame.size.width : 0
+        let frameWidth = collectionView.frame.size.width
+        let margin = GridTabTrayControllerUX.Margin
+        let cellWidth = frameWidth > 0 ? frameWidth : 0
         var cellHeight: CGFloat = 0
 
         if let groupCount = tabDisplayManager.tabGroups?.count, groupCount > 0 {
-            cellHeight = GroupedTabCellProperties.CellUX.defaultCellHeight * CGFloat(groupCount) // WT: to check
+            cellHeight = GroupedTabCellProperties.CellUX.defaultCellHeight * CGFloat(groupCount)
         }
 
         let itemSize = NSCollectionLayoutSize(
@@ -265,19 +268,20 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                heightDimension: .absolute(cellHeight))
-        let subitemsCount = 1
-        let subItems: [NSCollectionLayoutItem] = Array(repeating: item, count: Int(subitemsCount))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
-                                                       subitems: subItems)
-//        group.interItemSpacing = .fixed(GridTabTrayControllerUX.Margin)
+                                                       subitems: [item])
 
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: GridTabTrayControllerUX.Margin,
-            leading: GridTabTrayControllerUX.Margin,
-            bottom: GridTabTrayControllerUX.Margin,
-            trailing: GridTabTrayControllerUX.Margin)
-//        section.interGroupSpacing = GridTabTrayControllerUX.Margin
+        var bottomContentInset: CGFloat = 0
+
+        if tabDisplayManager.shouldEnableGroupedTabs,
+           tabDisplayManager.tabGroups?.count ?? 0 > 0 {
+            bottomContentInset = margin
+        }
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0,
+                                                        leading: 0,
+                                                        bottom: bottomContentInset,
+                                                        trailing: 0)
         return section
     }
 
@@ -300,7 +304,22 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
                                                        subitems: subItems)
         group.interItemSpacing = .fixed(GridTabTrayControllerUX.Margin)
 
+        let headerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(40)
+        )
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerSize,
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .top
+        )
+
         let section = NSCollectionLayoutSection(group: group)
+
+        if tabDisplayManager.tabGroups != nil {
+            section.boundarySupplementaryItems = [sectionHeader]
+        }
+
         section.contentInsets = NSDirectionalEdgeInsets(
             top: GridTabTrayControllerUX.Margin,
             leading: GridTabTrayControllerUX.Margin + collectionView.safeAreaInsets.left,
