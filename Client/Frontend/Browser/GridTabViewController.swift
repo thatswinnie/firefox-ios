@@ -210,7 +210,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         let layout = UICollectionViewCompositionalLayout(sectionProvider: { sectionIndex, environment in
             switch TabDisplaySection(rawValue: sectionIndex) {
             case .inactiveTabs:
-                return self.inactiveTabSectionLayout()
+                return self.inactiveTabSectionLayout(availableWidth: environment.container.contentSize.width)
             case .groupedTabs:
                 return self.groupedTabSectionLayout()
             case .regularTabs, .none:
@@ -221,7 +221,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         return layout
     }
 
-    private func inactiveTabSectionLayout() -> NSCollectionLayoutSection {
+    private func inactiveTabSectionLayout(availableWidth: CGFloat) -> NSCollectionLayoutSection {
         let frameWidth = collectionView.frame.size.width
         let margin = GridTabTrayControllerUX.Margin
         var cellWidth = (frameWidth - margin * 2) > 0 ? frameWidth - margin * 2 : 0
@@ -240,18 +240,20 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
                                                heightDimension: .estimated(estimatedHeight))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
                                                        subitems: [item])
-
         let section = NSCollectionLayoutSection(group: group)
 
-        var contentInset: CGFloat = 0
+        var verticalContentInset: CGFloat = 0
+        var horizontalContentInset: CGFloat = 0
         if !tabDisplayManager.isPrivate,
            tabDisplayManager.inactiveViewModel?.inactiveTabs.count ?? 0 > 0 {
-            contentInset = margin
+            let inset = (availableWidth - cellWidth) / 2.0
+            horizontalContentInset = inset > margin ? inset : margin
+            verticalContentInset = margin
         }
-        section.contentInsets = NSDirectionalEdgeInsets(top: contentInset,
-                                                        leading: contentInset,
-                                                        bottom: contentInset,
-                                                        trailing: contentInset)
+        section.contentInsets = NSDirectionalEdgeInsets(top: verticalContentInset,
+                                                        leading: horizontalContentInset,
+                                                        bottom: verticalContentInset,
+                                                        trailing: horizontalContentInset)
         return section
     }
 
