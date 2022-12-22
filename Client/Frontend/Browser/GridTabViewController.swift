@@ -223,9 +223,9 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
     private func inactiveTabSectionLayout() -> NSCollectionLayoutSection {
         let frameWidth = collectionView.frame.size.width
-        var cellWidth = (frameWidth - GridTabTrayControllerUX.Margin * 2) > 0 ?
-            frameWidth - GridTabTrayControllerUX.Margin * 2 : 0
-        let estimatedHeight = InactiveTabCell.UX.HeaderAndRowHeight + InactiveTabCell.UX.RoundedContainerPaddingClosed
+        let margin = GridTabTrayControllerUX.Margin
+        var cellWidth = (frameWidth - margin * 2) > 0 ? frameWidth - margin * 2 : 0
+        let estimatedHeight = tabLayoutDelegate.calculateInactiveTabSizeHelper(collectionView).height
 
         if UIDevice.current.userInterfaceIdiom == .pad {
             cellWidth = frameWidth/1.5
@@ -242,12 +242,16 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
                                                        subitems: [item])
 
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: GridTabTrayControllerUX.Margin,
-            leading: GridTabTrayControllerUX.Margin,
-            bottom: GridTabTrayControllerUX.Margin,
-            trailing: GridTabTrayControllerUX.Margin)
-//        section.interGroupSpacing = GridTabTrayControllerUX.Margin
+
+        var contentInset: CGFloat = 0
+        if !tabDisplayManager.isPrivate,
+           tabDisplayManager.inactiveViewModel?.inactiveTabs.count ?? 0 > 0 {
+            contentInset = margin
+        }
+        section.contentInsets = NSDirectionalEdgeInsets(top: contentInset,
+                                                        leading: contentInset,
+                                                        bottom: contentInset,
+                                                        trailing: contentInset)
         return section
     }
 
@@ -771,8 +775,7 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout, U
         return true
     }
 
-
-    private func calculateInactiveTabSizeHelper(_ collectionView: UICollectionView) -> CGSize {
+    fileprivate func calculateInactiveTabSizeHelper(_ collectionView: UICollectionView) -> CGSize {
         guard !tabDisplayManager.isPrivate,
               let inactiveTabViewModel = tabDisplayManager.inactiveViewModel,
               !inactiveTabViewModel.activeTabs.isEmpty
