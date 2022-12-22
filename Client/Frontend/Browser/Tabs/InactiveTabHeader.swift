@@ -19,6 +19,10 @@ enum ExpandButtonState {
 }
 
 class InactiveTabHeader: UITableViewHeaderFooterView, NotificationThemeable, ReusableCell {
+    struct UX {
+        static let buttonSize = CGSize(width: 24, height: 24)
+    }
+
     var state: ExpandButtonState? {
         willSet(state) {
             moreButton.setImage(state?.image, for: .normal)
@@ -76,6 +80,8 @@ class InactiveTabHeader: UITableViewHeaderFooterView, NotificationThemeable, Reu
             titleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: moreButton.leadingAnchor, constant: -16),
 
+            moreButton.widthAnchor.constraint(equalToConstant: UX.buttonSize.width),
+            moreButton.heightAnchor.constraint(equalToConstant: UX.buttonSize.height),
             moreButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
             moreButton.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -28),
         ])
