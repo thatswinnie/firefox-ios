@@ -112,12 +112,7 @@ extension InactiveTabCell: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        switch InactiveTabSection(rawValue: indexPath.section) {
-        case .inactive, .none:
-            return InactiveTabCell.UX.HeaderAndRowHeight
-        case .closeAllTabsButton:
-            return UITableView.automaticDimension
-        }
+        return UITableView.automaticDimension
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
