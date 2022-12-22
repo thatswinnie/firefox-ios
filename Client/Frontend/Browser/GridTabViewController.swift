@@ -710,10 +710,6 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout, U
     var lastYOffset: CGFloat = 0
     var tabDisplayManager: TabDisplayManager
 
-    var sectionHeaderSize: CGSize {
-        CGSize(width: 50, height: 40)
-    }
-
     enum ScrollDirection {
         case up
         case down
@@ -749,18 +745,6 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout, U
         }
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        switch TabDisplaySection(rawValue: section) {
-        case .regularTabs:
-            if let groups = tabDisplayManager.tabGroups, !groups.isEmpty {
-                return sectionHeaderSize
-            }
-        default: return .zero
-        }
-
-        return .zero
-    }
-
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
@@ -768,40 +752,6 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout, U
         return true
     }
 
-    @objc func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        minimumInteritemSpacingForSectionAt section: Int
-    ) -> CGFloat {
-        return GridTabTrayControllerUX.Margin
-    }
-
-    @objc func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        sizeForItemAt indexPath: IndexPath
-    ) -> CGSize {
-        let margin = GridTabTrayControllerUX.Margin * CGFloat(numberOfColumns + 1)
-        let calculatedWidth = collectionView.bounds.width - collectionView.safeAreaInsets.left - collectionView.safeAreaInsets.right - margin
-        let cellWidth = floor(calculatedWidth / CGFloat(numberOfColumns))
-        switch TabDisplaySection(rawValue: indexPath.section) {
-        case .inactiveTabs:
-            return calculateInactiveTabSizeHelper(collectionView)
-
-        case .groupedTabs:
-            let width = collectionView.frame.size.width
-            if let groupCount = tabDisplayManager.tabGroups?.count, groupCount > 0 {
-                let height: CGFloat = GroupedTabCellProperties.CellUX.defaultCellHeight * CGFloat(groupCount)
-                return CGSize(width: width >= 0 ? Int(width) : 0, height: Int(height))
-            } else {
-                return CGSize(width: 0, height: 0)
-            }
-
-        case .regularTabs, .none:
-            guard !tabDisplayManager.filteredTabs.isEmpty else { return CGSize(width: 0, height: 0) }
-            return CGSize(width: cellWidth, height: self.cellHeightForCurrentDevice())
-        }
-    }
 
     private func calculateInactiveTabSizeHelper(_ collectionView: UICollectionView) -> CGSize {
         guard !tabDisplayManager.isPrivate,
@@ -829,35 +779,6 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout, U
         } else {
             return CGSize(width: width >= 0 ? width : 0, height: totalHeight)
         }
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        switch TabDisplaySection(rawValue: section) {
-        case .regularTabs, .none:
-            return UIEdgeInsets(
-                top: GridTabTrayControllerUX.Margin,
-                left: GridTabTrayControllerUX.Margin + collectionView.safeAreaInsets.left,
-                bottom: GridTabTrayControllerUX.Margin,
-                right: GridTabTrayControllerUX.Margin + collectionView.safeAreaInsets.right)
-
-        case .inactiveTabs:
-            guard !tabDisplayManager.isPrivate,
-                  tabDisplayManager.inactiveViewModel?.inactiveTabs.count ?? 0 > 0
-            else { return .zero }
-
-            return UIEdgeInsets(equalInset: GridTabTrayControllerUX.Margin)
-
-        case .groupedTabs:
-            guard tabDisplayManager.shouldEnableGroupedTabs,
-                  tabDisplayManager.tabGroups?.count ?? 0 > 0
-            else { return .zero }
-
-            return UIEdgeInsets(equalInset: GridTabTrayControllerUX.Margin)
-        }
-    }
-
-    @objc func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return GridTabTrayControllerUX.Margin
     }
 
     @objc func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
