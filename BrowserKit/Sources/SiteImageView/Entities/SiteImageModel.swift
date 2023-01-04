@@ -5,7 +5,7 @@
 import UIKit
 
 /// Used to fill in information throughout the lifetime of an image request inside SiteImageView
-struct SiteImageModel {
+public struct SiteImageModel {
     /// A unique ID to tie the request to a certain image view
     let id: UUID
 
@@ -18,6 +18,9 @@ struct SiteImageModel {
     /// URL can be nil in case the urlStringRequest cannot be used to build a URL
     var siteURL: URL?
 
+    /// Used to cache any resources related to this request
+    var cacheKey: String
+
     /// Domain can be nil in case we don't have a siteURL to get the domain from
     var domain: ImageDomain?
 
@@ -25,7 +28,7 @@ struct SiteImageModel {
     var faviconURL: URL?
 
     /// The fetched or generated favicon image
-    var faviconImage: UIImage?
+    public var faviconImage: UIImage?
 
     /// The fetched hero image
     var heroImage: UIImage?

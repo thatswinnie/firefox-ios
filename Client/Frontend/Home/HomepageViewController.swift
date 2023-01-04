@@ -7,6 +7,7 @@ import UIKit
 import Storage
 import SyncTelemetry
 import MozillaAppServices
+import Common
 
 class HomepageViewController: UIViewController, HomePanel, FeatureFlaggable, Themeable {
     // MARK: - Typealiases
@@ -634,7 +635,7 @@ private extension HomepageViewController {
     }
 
     private func buildSite(from highlight: HighlightItem) -> Site {
-        let itemURL = highlight.siteUrl?.absoluteString ?? ""
+        let itemURL = highlight.urlString ?? ""
         return Site(url: itemURL, title: highlight.displayTitle)
     }
 

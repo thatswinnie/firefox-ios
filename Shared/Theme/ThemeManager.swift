@@ -3,9 +3,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0
 
 import UIKit
-import Shared
+import Common
 
-protocol ThemeManager {
+public protocol ThemeManager {
     var currentTheme: Theme { get }
 
     func getInterfaceStyle() -> UIUserInterfaceStyle
@@ -17,7 +17,7 @@ protocol ThemeManager {
 }
 
 /// The `ThemeManager` will be responsible for providing the theme throughout the app
-final class DefaultThemeManager: ThemeManager, Notifiable {
+final public class DefaultThemeManager: ThemeManager, Notifiable {
     // These have been carried over from the legacy system to maintain backwards compatibility
     private enum ThemeKeys {
         static let themeName = "prefKeyThemeName"
@@ -35,19 +35,24 @@ final class DefaultThemeManager: ThemeManager, Notifiable {
 
     // MARK: - Variables
 
-    var currentTheme: Theme = LightTheme()
-    var notificationCenter: NotificationProtocol
+    public var currentTheme: Theme = LightTheme()
+    public var notificationCenter: NotificationProtocol
     private var userDefaults: UserDefaultsInterface
     private var appDelegate: UIApplicationDelegate?
+    private var mainQueue: DispatchQueueInterface
 
     // MARK: - Init
 
-    init(userDefaults: UserDefaultsInterface? = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier),
-         notificationCenter: NotificationProtocol = NotificationCenter.default,
-         appDelegate: UIApplicationDelegate?) {
-        self.userDefaults = userDefaults ?? UserDefaults.standard
+    public init(userDefaults: UserDefaultsInterface = UserDefaults.standard,
+                notificationCenter: NotificationProtocol = NotificationCenter.default,
+                appDelegate: UIApplicationDelegate? = nil,
+                mainQueue: DispatchQueueInterface = DispatchQueue.main) {
+        self.userDefaults = userDefaults
         self.notificationCenter = notificationCenter
         self.appDelegate = appDelegate
+        self.mainQueue = mainQueue
+
+        migrateDefaultsToUseStandard()
 
         self.userDefaults.register(defaults: [ThemeKeys.systemThemeIsOn: true,
                                               ThemeKeys.NightMode.isOn: NSNumber(value: false)])
@@ -61,41 +66,37 @@ final class DefaultThemeManager: ThemeManager, Notifiable {
 
     // MARK: - ThemeManager
 
-    func getInterfaceStyle() -> UIUserInterfaceStyle {
+    public func getInterfaceStyle() -> UIUserInterfaceStyle {
         return currentTheme.type.getInterfaceStyle()
     }
 
-    func changeCurrentTheme(_ newTheme: ThemeType) {
+    public func changeCurrentTheme(_ newTheme: ThemeType) {
         guard currentTheme.type != newTheme else { return }
         currentTheme = newThemeForType(newTheme)
 
         // overwrite the user interface style on the window attached to our scene
         // once we have multiple scenes we need to update all of them
-        UIWindow.keyWindow?.overrideUserInterfaceStyle = currentTheme.type.getInterfaceStyle()
-
+        if #available(iOS 15, *) {
+            appDelegate?.window??.windowScene?.keyWindow?.overrideUserInterfaceStyle = currentTheme.type.getInterfaceStyle()
+        }
         // old way of updating the theme. We should pass in and save sceneDelegate instead of appDelegate
         appDelegate?.window??.overrideUserInterfaceStyle = currentTheme.type.getInterfaceStyle()
 
-        ensureMainThread { [weak self] in
+        mainQueue.ensureMainThread { [weak self] in
             self?.notificationCenter.post(name: .ThemeDidChange)
         }
     }
 
-    func systemThemeChanged() {
+    public func systemThemeChanged() {
         // Ignore if the system theme is off or night mode is on
         guard userDefaults.bool(forKey: ThemeKeys.systemThemeIsOn),
               let nightModeIsOn = userDefaults.object(forKey: ThemeKeys.NightMode.isOn) as? NSNumber,
               nightModeIsOn.boolValue == false
         else { return }
-
-        // TODO: This is hack because the notification is not arriving all the time
-        // Should be removed once the ThemeManager is done. 
-        let userInterfaceStyle = UIScreen.main.traitCollection.userInterfaceStyle
-        LegacyThemeManager.instance.current = userInterfaceStyle == .dark ? LegacyDarkTheme() : LegacyNormalTheme()
         changeCurrentTheme(getSystemThemeType())
     }
 
-    func setSystemTheme(isOn: Bool) {
+    public func setSystemTheme(isOn: Bool) {
         userDefaults.set(isOn, forKey: ThemeKeys.systemThemeIsOn)
 
         if isOn {
@@ -105,7 +106,7 @@ final class DefaultThemeManager: ThemeManager, Notifiable {
         }
     }
 
-    func setAutomaticBrightness(isOn: Bool) {
+    public func setAutomaticBrightness(isOn: Bool) {
         let currentState = userDefaults.bool(forKey: ThemeKeys.AutomaticBrightness.isOn)
         guard currentState != isOn else { return }
 
@@ -113,7 +114,7 @@ final class DefaultThemeManager: ThemeManager, Notifiable {
         brightnessChanged()
     }
 
-    func setAutomaticBrightnessValue(_ value: Float) {
+    public func setAutomaticBrightnessValue(_ value: Float) {
         userDefaults.set(value, forKey: ThemeKeys.AutomaticBrightness.thresholdValue)
         brightnessChanged()
     }
@@ -126,9 +127,7 @@ final class DefaultThemeManager: ThemeManager, Notifiable {
             return .dark
         }
         var themeType = getSystemThemeType()
-
-        // TODO: Temporarily use user defaults directly until we figure out how to manage these values FXIOS-5058
-        if let savedThemeDescription = UserDefaults.standard.string(forKey: ThemeKeys.themeName),
+        if let savedThemeDescription = userDefaults.string(forKey: ThemeKeys.themeName),
            let savedTheme = ThemeType(rawValue: savedThemeDescription) {
             themeType = savedTheme
         }
@@ -169,9 +168,26 @@ final class DefaultThemeManager: ThemeManager, Notifiable {
         }
     }
 
+    private func migrateDefaultsToUseStandard() {
+        guard let oldDefaultsStore = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier) else { return }
+
+        if let systemThemeIsOn = oldDefaultsStore.value(forKey: ThemeKeys.systemThemeIsOn) {
+            userDefaults.set(systemThemeIsOn, forKey: ThemeKeys.systemThemeIsOn)
+        }
+        if let nightModeIsOn = oldDefaultsStore.value(forKey: ThemeKeys.NightMode.isOn) {
+            userDefaults.set(nightModeIsOn, forKey: ThemeKeys.NightMode.isOn)
+        }
+        if let automaticBrightnessIsOn = oldDefaultsStore.value(forKey: ThemeKeys.AutomaticBrightness.isOn) {
+            userDefaults.set(automaticBrightnessIsOn, forKey: ThemeKeys.AutomaticBrightness.isOn)
+        }
+        if let automaticBrighnessValue = oldDefaultsStore.value(forKey: ThemeKeys.AutomaticBrightness.thresholdValue) {
+            userDefaults.set(automaticBrighnessValue, forKey: ThemeKeys.AutomaticBrightness.thresholdValue)
+        }
+    }
+
     // MARK: - Notifiable
 
-    func handleNotifications(_ notification: Notification) {
+    public func handleNotifications(_ notification: Notification) {
         switch notification.name {
         case UIScreen.brightnessDidChangeNotification:
             brightnessChanged()
