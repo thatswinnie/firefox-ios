@@ -5,6 +5,7 @@
 import UIKit
 import Shared
 import Storage
+import SiteImageView
 
 private struct RecentlyClosedPanelUX {
     static let IconSize = CGSize(width: 23, height: 23)
@@ -102,17 +103,13 @@ class RecentlyClosedTabsPanelSiteTableViewController: SiteTableViewController {
         }
         let tab = recentlyClosedTabs[indexPath.row]
         let displayURL = tab.url.displayURL ?? tab.url
-        let site: Favicon? = (tab.faviconURL != nil) ? Favicon(url: tab.faviconURL!) : nil
         twoLineCell.descriptionLabel.isHidden = false
         twoLineCell.titleLabel.text = tab.title
         twoLineCell.titleLabel.isHidden = tab.title?.isEmpty ?? true ? true : false
         twoLineCell.descriptionLabel.text = displayURL.absoluteDisplayString
         twoLineCell.leftImageView.layer.borderColor = RecentlyClosedPanelUX.IconBorderColor.cgColor
         twoLineCell.leftImageView.layer.borderWidth = RecentlyClosedPanelUX.IconBorderWidth
-        twoLineCell.leftImageView.contentMode = .center
-        twoLineCell.leftImageView.setImageAndBackground(forIcon: site, website: displayURL) { [weak twoLineCell] in
-            twoLineCell?.leftImageView.image = twoLineCell?.leftImageView.image?.createScaled(RecentlyClosedPanelUX.IconSize)
-        }
+        twoLineCell.leftImageView.setFavicon(FaviconImageViewModel(urlStringRequest: displayURL.absoluteString))
 
         return twoLineCell
     }
