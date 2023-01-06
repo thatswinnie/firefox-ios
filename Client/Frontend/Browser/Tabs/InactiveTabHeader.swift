@@ -18,10 +18,21 @@ enum ExpandButtonState {
     }
 }
 
-class InactiveTabHeader: UITableViewHeaderFooterView, NotificationThemeable, ReusableCell {
+class InactiveTabHeader: UICollectionReusableView, NotificationThemeable, ReusableCell {
     struct UX {
         static let buttonSize = CGSize(width: 24, height: 24)
+        static let font = DynamicFontHelper.defaultHelper.preferredFont(
+            withTextStyle: .headline,
+            size: 17)
     }
+
+//    static var height: CGFloat {
+//        let height = "Sample".boundingRectWithSize(CGSizeMake(CGFloat.max, UIScreen.mainScreen().bounds.size.width),
+//                                                   options: .UsesLineFragmentOrigin,
+//                                                   attributes: [NSFontAttributeName: UX.font],
+//                                                   context: nil).size.height
+//        return max(InactiveTabCell.UX.HeaderAndRowHeight, height)
+//    }
 
     var state: ExpandButtonState? {
         willSet(state) {
@@ -32,9 +43,7 @@ class InactiveTabHeader: UITableViewHeaderFooterView, NotificationThemeable, Reu
     lazy var titleLabel: UILabel = .build { titleLabel in
         titleLabel.text = self.title
         titleLabel.textColor = UIColor.theme.homePanel.activityStreamHeaderText
-        titleLabel.font = DynamicFontHelper.defaultHelper.preferredFont(
-            withTextStyle: .headline,
-            size: 17)
+        titleLabel.font = UX.font
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.minimumScaleFactor = 0.6
         titleLabel.numberOfLines = 1
@@ -62,11 +71,11 @@ class InactiveTabHeader: UITableViewHeaderFooterView, NotificationThemeable, Reu
         moreButton.removeTarget(nil, action: nil, for: .allEvents)
     }
 
-    override init(reuseIdentifier: String?) {
-        super.init(reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
 
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(moreButton)
+        addSubview(titleLabel)
+        addSubview(moreButton)
         moreButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
         isAccessibilityElement = true
@@ -74,9 +83,9 @@ class InactiveTabHeader: UITableViewHeaderFooterView, NotificationThemeable, Reu
         accessibilityIdentifier = AccessibilityIdentifiers.TabTray.inactiveTabHeader
 
         NSLayoutConstraint.activate([
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 19),
-            titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -19),
+            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 19),
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -19),
             titleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: moreButton.leadingAnchor, constant: -16),
 

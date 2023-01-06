@@ -11,7 +11,7 @@ struct CellWithRoundedButtonUX {
     static let ButtonImagePadding: CGFloat = 11
 }
 
-class CellWithRoundedButton: UITableViewCell, NotificationThemeable, ReusableCell {
+class CellWithRoundedButton: UICollectionReusableView, NotificationThemeable, ReusableCell {
     // MARK: - Properties
     var buttonClosure: (() -> Void)?
 
@@ -47,8 +47,8 @@ class CellWithRoundedButton: UITableViewCell, NotificationThemeable, ReusableCel
     }()
 
     // MARK: - Initializers
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         initialViewSetup()
     }
 
@@ -57,10 +57,10 @@ class CellWithRoundedButton: UITableViewCell, NotificationThemeable, ReusableCel
     }
 
     func initialViewSetup() {
-        separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        self.selectionStyle = .default
+//        separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//        self.selectionStyle = .default
 
-        contentView.addSubview(roundedButton)
+        addSubview(roundedButton)
 
         roundedButton.setInsets(forContentPadding: UIEdgeInsets(top: CellWithRoundedButtonUX.ButtonInset,
                                                                 left: CellWithRoundedButtonUX.ButtonInset,
@@ -72,14 +72,14 @@ class CellWithRoundedButton: UITableViewCell, NotificationThemeable, ReusableCel
         let leadingOffSet: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 100 : 23
 
         NSLayoutConstraint.activate([
-            roundedButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            roundedButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: trailingOffSet),
-            roundedButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -leadingOffSet),
-            roundedButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            roundedButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24)
+            roundedButton.centerXAnchor.constraint(equalTo: centerXAnchor),
+            roundedButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: trailingOffSet),
+            roundedButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -leadingOffSet),
+            roundedButton.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            roundedButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24)
         ])
 
-        selectedBackgroundView = selectedView
+//        selectedBackgroundView = selectedView
         applyTheme()
     }
 
@@ -90,8 +90,8 @@ class CellWithRoundedButton: UITableViewCell, NotificationThemeable, ReusableCel
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.selectionStyle = .default
-        separatorInset = UIEdgeInsets(top: 0, left: CellWithRoundedButtonUX.ImageSize + 2 * CellWithRoundedButtonUX.BorderViewMargin, bottom: 0, right: 0)
+//        self.selectionStyle = .default
+//        separatorInset = UIEdgeInsets(top: 0, left: CellWithRoundedButtonUX.ImageSize + 2 * CellWithRoundedButtonUX.BorderViewMargin, bottom: 0, right: 0)
         applyTheme()
     }
 

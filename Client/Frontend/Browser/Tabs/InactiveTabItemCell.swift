@@ -4,7 +4,7 @@
 
 import UIKit
 
-class InactiveTabItemCell: UITableViewCell, NotificationThemeable, ReusableCell {
+class InactiveTabItemCell: UICollectionViewCell, NotificationThemeable, ReusableCell {
     private var viewModel: InactiveTabItemCellModel?
 
     private var selectedView: UIView = {
@@ -35,8 +35,8 @@ class InactiveTabItemCell: UITableViewCell, NotificationThemeable, ReusableCell 
     private lazy var containerView: UIView = .build { _ in }
     private lazy var midView: UIView = .build { _ in }
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         initialViewSetup()
     }
 
@@ -51,31 +51,31 @@ class InactiveTabItemCell: UITableViewCell, NotificationThemeable, ReusableCell 
         titleLabel.font = viewModel.fontForLabel
         leftImageView.setImageAndBackground(forIcon: viewModel.icon,
                                             website: viewModel.website) {}
-        separatorInset = UIEdgeInsets(top: 0,
-                                      left: InactiveTabItemCellModel.UX.ImageSize + 2 *
-                                      InactiveTabItemCellModel.UX.BorderViewMargin,
-                                      bottom: 0,
-                                      right: 0)
+//        separatorInset = UIEdgeInsets(top: 0,
+//                                      left: InactiveTabItemCellModel.UX.ImageSize + 2 *
+//                                      InactiveTabItemCellModel.UX.BorderViewMargin,
+//                                      bottom: 0,
+//                                      right: 0)
         backgroundColor = .clear
     }
 
     func initialViewSetup() {
-        self.selectionStyle = .default
+//        self.selectionStyle = .default
         midView.addSubview(titleLabel)
         containerView.addSubviews(bottomSeparatorView)
         containerView.addSubview(leftImageView)
         containerView.addSubview(midView)
 
-        contentView.addSubview(containerView)
+        addSubview(containerView)
         bringSubviewToFront(containerView)
 
-        containerViewLeadingConstraint = containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
+        containerViewLeadingConstraint = containerView.leadingAnchor.constraint(equalTo: leadingAnchor)
 
         NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            containerView.topAnchor.constraint(equalTo: topAnchor),
+            containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             containerViewLeadingConstraint,
-            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
             leftImageView.heightAnchor.constraint(equalToConstant: InactiveTabItemCellModel.UX.ImageSize),
             leftImageView.widthAnchor.constraint(equalToConstant: InactiveTabItemCellModel.UX.ImageSize),
@@ -127,7 +127,7 @@ class InactiveTabItemCell: UITableViewCell, NotificationThemeable, ReusableCell 
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        selectionStyle = .default
+//        selectionStyle = .default
         applyTheme()
     }
 }

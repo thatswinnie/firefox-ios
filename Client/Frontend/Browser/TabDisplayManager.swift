@@ -512,7 +512,11 @@ extension TabDisplayManager: UICollectionViewDataSource {
         case .inactiveTabs:
             // Hide inactive tray if there are no inactive tabs
             guard let vm = inactiveViewModel, !vm.inactiveTabs.isEmpty else { return 0 }
-            return shouldEnableInactiveTabs ? (isPrivate ? 0 : 1) : 0
+
+            if shouldEnableInactiveTabs, !isPrivate {
+                return isInactiveViewExpanded ? inactiveViewModel?.inactiveTabs.count ?? 0 : 0
+            }
+            return 0
         case .groupedTabs:
             // Hide grouped tab section if there are no grouped tabs
             guard let groups = tabGroups, !groups.isEmpty else { return 0 }
@@ -528,49 +532,97 @@ extension TabDisplayManager: UICollectionViewDataSource {
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath)
     -> UICollectionReusableView {
-        if let view = collectionView.dequeueReusableSupplementaryView(
-            ofKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: GridTabViewController.independentTabsHeaderIdentifier,
-            for: indexPath) as? LabelButtonHeaderView {
-            let viewModel = tabGroups == nil ? LabelButtonHeaderViewModel.emptyHeader : LabelButtonHeaderViewModel(
-                leadingInset: 0,
-                title: .TabTrayOtherTabsSectionHeader,
-                titleA11yIdentifier: AccessibilityIdentifiers.TabTray.filteredTabs,
-                isButtonHidden: true)
+        switch TabDisplaySection(rawValue: indexPath.section) {
+        case .inactiveTabs:
+            if kind == UICollectionView.elementKindSectionHeader,
+               let view = collectionView.dequeueReusableSupplementaryView(
+                ofKind: UICollectionView.elementKindSectionHeader,
+                withReuseIdentifier: InactiveTabHeader.cellIdentifier,
+                for: indexPath) as? InactiveTabHeader {
+                view.state = isInactiveViewExpanded ? .down : .right
+                view.title = String.TabsTrayInactiveTabsSectionTitle
+                view.accessibilityLabel = isInactiveViewExpanded ?
+                    .TabsTray.InactiveTabs.TabsTrayInactiveTabsSectionOpenedAccessibilityTitle :
+                    .TabsTray.InactiveTabs.TabsTrayInactiveTabsSectionClosedAccessibilityTitle
+                view.moreButton.isHidden = false
+                view.moreButton.addTarget(self,
+                                          action: #selector(toggleInactiveTab),
+                                          for: .touchUpInside)
+                view.backgroundColor = .clear
+                let tapGestureRecognizer = UITapGestureRecognizer(target: self,
+                                                                  action: #selector(toggleInactiveTab))
+                view.addGestureRecognizer(tapGestureRecognizer)
+//                delegate?.setupCFR(with: headerView.titleLabel)
+                return view
+            } else if kind == UICollectionView.elementKindSectionFooter,
+                      let view = collectionView.dequeueReusableSupplementaryView(
+                       ofKind: UICollectionView.elementKindSectionFooter,
+                       withReuseIdentifier: CellWithRoundedButton.cellIdentifier,
+                       for: indexPath) as? CellWithRoundedButton {
+                view.isHidden = !isInactiveViewExpanded
+                return view
+            }
 
-            view.configure(viewModel: viewModel, theme: theme)
-            view.titleLabel.font = .systemFont(ofSize: GroupedTabCellProperties.CellUX.titleFontSize, weight: .semibold)
+            return UICollectionReusableView()
 
-            return view
+        default:
+            if let view = collectionView.dequeueReusableSupplementaryView(
+                ofKind: UICollectionView.elementKindSectionHeader,
+                withReuseIdentifier: GridTabViewController.independentTabsHeaderIdentifier,
+                for: indexPath) as? LabelButtonHeaderView {
+                let viewModel = tabGroups == nil ? LabelButtonHeaderViewModel.emptyHeader : LabelButtonHeaderViewModel(
+                    leadingInset: 0,
+                    title: .TabTrayOtherTabsSectionHeader,
+                    titleA11yIdentifier: AccessibilityIdentifiers.TabTray.filteredTabs,
+                    isButtonHidden: true)
+
+                view.configure(viewModel: viewModel, theme: theme)
+                view.titleLabel.font = .systemFont(ofSize: GroupedTabCellProperties.CellUX.titleFontSize, weight: .semibold)
+
+                return view
+            }
+
+            return UICollectionReusableView()
         }
-        return UICollectionReusableView()
     }
 
-    @objc func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.tabReuseIdentifer, for: indexPath)
+    @objc func collectionView(_ collectionView: UICollectionView,
+                              cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.tabReuseIdentifer, for: indexPath)
         if tabDisplayType == .TopTabTray {
-            guard let tab = dataStore.at(indexPath.row) else { return cell }
-            cell = tabDisplayer?.cellFactory(for: cell, using: tab) ?? cell
-            return cell
+            var cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.tabReuseIdentifer, for: indexPath)
+
+            guard let tab = dataStore.at(indexPath.row) else {
+                return cell
+            }
+            return tabDisplayer?.cellFactory(for: cell, using: tab) ?? cell
         }
         assert(tabDisplayer != nil)
         switch TabDisplaySection(rawValue: indexPath.section) {
         case .inactiveTabs:
-            if let inactiveCell = collectionView.dequeueReusableCell(withReuseIdentifier: InactiveTabCell.cellIdentifier, for: indexPath) as? InactiveTabCell {
-                inactiveCell.applyTheme(theme)
-                inactiveCell.inactiveTabsViewModel = inactiveViewModel
-                inactiveCell.hasExpanded = isInactiveViewExpanded
-                inactiveCell.delegate = self
-                inactiveCell.tableView.reloadData()
-                cell = inactiveCell
-                if !hasSentInactiveTabShownEvent {
-                    hasSentInactiveTabShownEvent = true
-                    TelemetryWrapper.recordEvent(category: .action, method: .tap, object: .inactiveTabTray, value: .inactiveTabShown, extras: nil)
-                }
+            if let inactiveCell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: InactiveTabItemCell.cellIdentifier,
+                for: indexPath) as? InactiveTabItemCell,
+                let tab = inactiveViewModel?.inactiveTabs[indexPath.item] {
+                let viewModel = InactiveTabItemCellModel(title: tab.getTabTrayTitle(),
+                                                         icon: tab.displayFavicon,
+                                                         website: getTabDomainUrl(tab: tab))
+//                inactiveCell.applyTheme(theme)
+                inactiveCell.configureCell(viewModel: viewModel)
+//                inactiveCell.hasExpanded = isInactiveViewExpanded
+//                inactiveCell.delegate = self
+//                inactiveCell.tableView.reloadData()
+                return inactiveCell
+//                if !hasSentInactiveTabShownEvent {
+//                    hasSentInactiveTabShownEvent = true
+//                    TelemetryWrapper.recordEvent(category: .action, method: .tap, object: .inactiveTabTray, value: .inactiveTabShown, extras: nil)
+//                }
             }
 
         case .groupedTabs:
-            if let groupedCell = collectionView.dequeueReusableCell(withReuseIdentifier: GroupedTabCell.cellIdentifier, for: indexPath) as? GroupedTabCell {
+            if let groupedCell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: GroupedTabCell.cellIdentifier,
+                for: indexPath) as? GroupedTabCell {
                 groupedCell.theme = theme
                 groupedCell.tabDisplayManagerDelegate = self
                 groupedCell.tabGroups = self.tabGroups
@@ -578,23 +630,33 @@ extension TabDisplayManager: UICollectionViewDataSource {
                 groupedCell.selectedTab = tabManager.selectedTab
                 groupedCell.tableView.reloadData()
                 groupedCell.scrollToSelectedGroup()
-                cell = groupedCell
+                return groupedCell
             }
 
         case .regularTabs:
-            guard let tab = dataStore.at(indexPath.row) else { return cell }
-            cell = tabDisplayer?.cellFactory(for: cell, using: tab) ?? cell
+            var cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.tabReuseIdentifer, for: indexPath)
+
+            guard let tab = dataStore.at(indexPath.row) else {
+                return cell
+            }
+            return tabDisplayer?.cellFactory(for: cell, using: tab) ?? cell
 
         case .none:
-            return cell
+            return collectionView.dequeueReusableCell(withReuseIdentifier: self.tabReuseIdentifer, for: indexPath)
         }
 
-        return cell
+        return collectionView.dequeueReusableCell(withReuseIdentifier: self.tabReuseIdentifer, for: indexPath)
     }
 
     @objc func numberOfSections(in collectionView: UICollectionView) -> Int {
         if tabDisplayType == .TopTabTray { return 1 }
-        return  TabDisplaySection.allCases.count
+        return TabDisplaySection.allCases.count
+    }
+
+    func getTabDomainUrl(tab: Tab) -> URL? {
+        guard tab.url != nil else { return tab.sessionData?.urls.last?.domainURL }
+
+        return tab.url?.domainURL
     }
 }
 
@@ -673,6 +735,10 @@ extension TabDisplayManager: InactiveTabsDelegate {
         }
     }
 
+    @objc func toggleInactiveTab() {
+        toggleInactiveTabSection(hasExpanded: !isInactiveViewExpanded)
+    }
+
     func toggleInactiveTabSection(hasExpanded: Bool) {
         let hasExpandedEvent: TelemetryWrapper.EventValue = hasExpanded ? .inactiveTabExpand : .inactiveTabCollapse
         TelemetryWrapper.recordEvent(category: .action, method: .tap, object: .inactiveTabTray, value: hasExpandedEvent, extras: nil)
@@ -680,7 +746,31 @@ extension TabDisplayManager: InactiveTabsDelegate {
         isInactiveViewExpanded = hasExpanded
         let indexPath = IndexPath(row: 0, section: TabDisplaySection.inactiveTabs.rawValue)
         collectionView.reloadItems(at: [indexPath])
-        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+
+        if let attributes = collectionView.collectionViewLayout.layoutAttributesForSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            at: indexPath),
+            let layout = collectionView.collectionViewLayout as? UICollectionViewCompositionalLayout {
+//
+//            NSIndexPath *indexPath = ... // indexPath of your header, item must be 0
+//
+//            CGFloat offsetY = [collectionView layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:indexPath].frame.origin.y;
+//
+//            CGFloat contentInsetY = self.contentInset.top;
+//            CGFloat sectionInsetY = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).sectionInset.top;
+//
+//            [collectionView setContentOffset:CGPointMake(collectionView.contentOffset.x, offsetY - contentInsetY - sectionInsetY) animated:YES];
+
+//            let sectionInsetY = collectionView.collectionViewLayout.sectionInset.top
+            let sectionInsetY = layout.configuration.interSectionSpacing
+            let point = CGPoint(x: 0,
+                                y: attributes.frame.origin.y - collectionView.contentInset.top - sectionInsetY)
+            print("WT: \(point)")
+            collectionView.setContentOffset(
+                point,
+                animated: true)
+        }
+//        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
     }
 
     func setupCFR(with view: UILabel) {

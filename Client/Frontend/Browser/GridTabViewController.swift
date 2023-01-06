@@ -184,11 +184,19 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
                                           collectionViewLayout: getCompositionalLayout())
         collectionView.register(cellType: TabCell.self)
         collectionView.register(cellType: GroupedTabCell.self)
-        collectionView.register(cellType: InactiveTabCell.self)
+        collectionView.register(cellType: InactiveTabItemCell.self)
         collectionView.register(
             LabelButtonHeaderView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: GridTabViewController.independentTabsHeaderIdentifier)
+        collectionView.register(
+            InactiveTabHeader.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: InactiveTabHeader.cellIdentifier)
+        collectionView.register(
+            CellWithRoundedButton.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: CellWithRoundedButton.cellIdentifier)
 
         tabDisplayManager = TabDisplayManager(collectionView: self.collectionView,
                                               tabManager: self.tabManager,
@@ -208,7 +216,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         let config = UICollectionViewCompositionalLayoutConfiguration()
         config.scrollDirection = .vertical
 
-        let layout = UICollectionViewCompositionalLayout(sectionProvider: { sectionIndex, environment in
+        let layout = GridTabViewControllerLayout(sectionProvider: { sectionIndex, environment in
             switch TabDisplaySection(rawValue: sectionIndex) {
             case .inactiveTabs:
                 return self.inactiveTabSectionLayout(availableWidth: environment.container.contentSize.width)
@@ -218,6 +226,9 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
                 return self.regularTabSectionLayout()
             }
         }, configuration: config)
+
+        layout.register(InactiveTabCellBackgroundView.self,
+                        forDecorationViewOfKind: InactiveTabCellBackgroundView.cellIdentifier)
 
         return layout
     }
@@ -234,7 +245,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .absolute(cellWidth),
-            heightDimension: .fractionalHeight(1.0))
+            heightDimension: .estimated(InactiveTabCell.UX.HeaderAndRowHeight))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
@@ -255,6 +266,39 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
                                                         leading: horizontalContentInset,
                                                         bottom: verticalContentInset,
                                                         trailing: horizontalContentInset)
+
+        let headerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(55)
+        )
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerSize,
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .top,
+            absoluteOffset: CGPoint(x: 0, y: verticalContentInset)
+        )
+//        sectionHeader.contentInsets = NSDirectionalEdgeInsets(top: verticalContentInset,
+//                                                              leading: 0,
+//                                                              bottom: 0,
+//                                                              trailing: 0)
+
+        let footerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(InactiveTabCell.UX.HeaderAndRowHeight)
+        )
+        let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: footerSize,
+            elementKind: UICollectionView.elementKindSectionFooter,
+            alignment: .bottom
+        )
+
+        section.boundarySupplementaryItems = [sectionHeader, sectionFooter]
+
+        let backgroundItem = NSCollectionLayoutDecorationItem.background(
+            elementKind: InactiveTabCellBackgroundView.cellIdentifier)
+//        backgroundItem.contentInsets = section.contentInsets
+        section.decorationItems = [backgroundItem]
+
         return section
     }
 
@@ -313,7 +357,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(40)
+            heightDimension: .absolute(40)
         )
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
@@ -430,6 +474,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         emptyPrivateTabsView.applyTheme(themeManager.currentTheme)
         backgroundPrivacyOverlay.backgroundColor = themeManager.currentTheme.colors.layerScrim
         collectionView.backgroundColor = themeManager.currentTheme.colors.layer3
+        (collectionView.collectionViewLayout as? GridTabViewControllerLayout)?.inactiveSectionBackgroundColor = themeManager.currentTheme.colors.layer5
         collectionView.reloadData()
     }
 }
