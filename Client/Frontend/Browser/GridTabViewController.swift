@@ -285,6 +285,10 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 //                                                              bottom: 0,
 //                                                              trailing: 0)
 
+        guard tabDisplayManager.shouldEnableInactiveTabs, !tabDisplayManager.isPrivate else {
+            return section
+        }
+
         let footerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .estimated(InactiveTabCell.UX.HeaderAndRowHeight)
