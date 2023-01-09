@@ -57,7 +57,6 @@ class CellWithRoundedButton: UICollectionReusableView, NotificationThemeable, Re
     }
 
     func initialViewSetup() {
-//        separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
 //        self.selectionStyle = .default
 
         addSubview(roundedButton)
@@ -91,7 +90,6 @@ class CellWithRoundedButton: UICollectionReusableView, NotificationThemeable, Re
     override func prepareForReuse() {
         super.prepareForReuse()
 //        self.selectionStyle = .default
-//        separatorInset = UIEdgeInsets(top: 0, left: CellWithRoundedButtonUX.ImageSize + 2 * CellWithRoundedButtonUX.BorderViewMargin, bottom: 0, right: 0)
         applyTheme()
     }
 

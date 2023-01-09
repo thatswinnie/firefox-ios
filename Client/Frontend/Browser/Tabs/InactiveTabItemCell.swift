@@ -52,11 +52,6 @@ class InactiveTabItemCell: UICollectionViewCell, NotificationThemeable, Reusable
             leftImageView.setFavicon(FaviconImageViewModel(urlStringRequest: urlString,
                                                            faviconCornerRadius: cornerRadius))
         }
-//        separatorInset = UIEdgeInsets(top: 0,
-//                                      left: InactiveTabItemCellModel.UX.ImageSize + 2 *
-//                                      InactiveTabItemCellModel.UX.BorderViewMargin,
-//                                      bottom: 0,
-//                                      right: 0)
         backgroundColor = .clear
     }
 
