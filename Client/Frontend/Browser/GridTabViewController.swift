@@ -40,8 +40,8 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
     static let independentTabsHeaderIdentifier = "IndependentTabs"
     var otherBrowsingModeOffset = CGPoint.zero
     // Backdrop used for displaying greyed background for private tabs
-    var backgroundPrivacyOverlay = UIView()
     var collectionView: UICollectionView!
+    var backgroundPrivacyOverlay: UIView = .build { _ in }
     var recentlyClosedTabsPanel: RecentlyClosedTabsPanel?
     var notificationCenter: NotificationProtocol
     var contextualHintViewController: ContextualHintViewController
@@ -57,11 +57,9 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         return true
     }
 
-    private lazy var emptyPrivateTabsView: EmptyPrivateTabsView = {
-        let emptyView = EmptyPrivateTabsView()
-        emptyView.learnMoreButton.addTarget(self, action: #selector(didTapLearnMore), for: .touchUpInside)
-        return emptyView
-    }()
+    private lazy var emptyPrivateTabsView: EmptyPrivateTabsView = .build { view in
+        view.learnMoreButton.addTarget(self, action: #selector(self.didTapLearnMore), for: .touchUpInside)
+    }
 
     private lazy var tabLayoutDelegate: TabLayoutDelegate = {
         let delegate = TabLayoutDelegate(tabDisplayManager: self.tabDisplayManager,
@@ -113,7 +111,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         collectionView.dragDelegate = tabDisplayManager
         collectionView.dropDelegate = tabDisplayManager
 
-        setupView()
+        setupLayout()
 
         if let tab = tabManager.selectedTab, tab.isPrivate {
             tabDisplayManager.togglePrivateMode(isOn: true, createTabOnEmptyPrivateMode: false)
@@ -132,7 +130,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.view.layoutIfNeeded()
+        view.layoutIfNeeded()
         focusItem()
     }
 
@@ -156,27 +154,27 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
     }
 
     // MARK: - Private
-    private func setupView() {
-        // TODO: Remove SNAPKIT - this will require some work as the layouts
-        // are using other snapkit constraints and this will require modification
-        // in several places.
-        [backgroundPrivacyOverlay, collectionView].forEach { view.addSubview($0) }
-        setupConstraints()
+    private func setupLayout() {
+        view.addSubview(backgroundPrivacyOverlay)
+        view.addSubview(collectionView)
+        view.addSubview(emptyPrivateTabsView)
 
-        view.insertSubview(emptyPrivateTabsView, aboveSubview: collectionView)
-        emptyPrivateTabsView.snp.makeConstraints { make in
-            make.top.bottom.left.right.equalTo(self.collectionView)
-        }
-    }
+        NSLayoutConstraint.activate([
+            backgroundPrivacyOverlay.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundPrivacyOverlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            backgroundPrivacyOverlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundPrivacyOverlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 
-    private func setupConstraints() {
-        backgroundPrivacyOverlay.snp.makeConstraints { make in
-            make.edges.equalTo(self.view)
-        }
-
-        collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            emptyPrivateTabsView.topAnchor.constraint(equalTo: collectionView.topAnchor),
+            emptyPrivateTabsView.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor),
+            emptyPrivateTabsView.leadingAnchor.constraint(equalTo: collectionView.leadingAnchor),
+            emptyPrivateTabsView.trailingAnchor.constraint(equalTo: collectionView.trailingAnchor),
+        ])
     }
 
     private func collectionViewSetup() {
@@ -212,6 +210,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
                                               theme: themeManager.currentTheme)
         collectionView.dataSource = tabDisplayManager
         collectionView.delegate = tabLayoutDelegate
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
 
         tabDisplayManager.tabDisplayCompletionDelegate = self
     }
@@ -705,7 +704,7 @@ extension GridTabViewController: TabPeekDelegate {
     }
 }
 
-// MARK: - TabDisplayCompeltionDelegate & RecentlyClosedPanelDelegate
+// MARK: - TabDisplayCompletionDelegate & RecentlyClosedPanelDelegate
 extension GridTabViewController: TabDisplayCompletionDelegate, RecentlyClosedPanelDelegate {
     // RecentlyClosedPanelDelegate
     func openRecentlyClosedSiteInSameTab(_ url: URL) {
