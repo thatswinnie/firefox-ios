@@ -118,8 +118,8 @@ class InactiveTabCell: UICollectionViewCell, ReusableCell {
 //    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 //        switch InactiveTabSection(rawValue: indexPath.section) {
 //        case .inactive:
-//            guard let cell = tableView.dequeueReusableCell(withIdentifier: InactiveTabItemCellOld.cellIdentifier,
-//                                                           for: indexPath) as? InactiveTabItemCellOld
+//            guard let cell = tableView.dequeueReusableCell(withIdentifier: InactiveTabItemCell.cellIdentifier,
+//                                                           for: indexPath) as? InactiveTabItemCell
 //            else {
 //                return UITableViewCell()
 //            }
@@ -127,14 +127,13 @@ class InactiveTabCell: UICollectionViewCell, ReusableCell {
 //            guard let tab = inactiveTabsViewModel?.inactiveTabs[indexPath.item] else { return cell }
 //
 //            let viewModel = InactiveTabItemCellModel(title: tab.getTabTrayTitle(),
-//                                                     icon: tab.displayFavicon,
 //                                                     website: getTabDomainUrl(tab: tab))
 //            cell.configureCell(viewModel: viewModel)
 //            return cell
 //
 //        case .closeAllTabsButton:
-//            guard let cell = tableView.dequeueReusableCell(withIdentifier: CellWithRoundedButtonOld.cellIdentifier,
-//                                                           for: indexPath) as? CellWithRoundedButtonOld
+//            guard let cell = tableView.dequeueReusableCell(withIdentifier: CellWithRoundedButton.cellIdentifier,
+//                                                           for: indexPath) as? CellWithRoundedButton
 //            else {
 //                return UITableViewCell()
 //            }
@@ -186,7 +185,7 @@ class InactiveTabCell: UICollectionViewCell, ReusableCell {
 //    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 //        switch InactiveTabSection(rawValue: section) {
 //        case .inactive, .none:
-//            guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: InactiveTabHeaderOld.cellIdentifier) as? InactiveTabHeaderOld else { return nil }
+//            guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: InactiveTabHeader.cellIdentifier) as? InactiveTabHeader else { return nil }
 //            headerView.state = hasExpanded ? .down : .right
 //            headerView.title = String.TabsTrayInactiveTabsSectionTitle
 //            headerView.accessibilityLabel = hasExpanded ?
@@ -231,7 +230,7 @@ class InactiveTabCell: UICollectionViewCell, ReusableCell {
 //        case .closeAllTabsButton, .none: return
 //        }
 //    }
-//
+
 //    @objc func toggleInactiveTabSection() {
 //        hasExpanded = !hasExpanded
 //        tableView.reloadData()
@@ -265,7 +264,7 @@ class InactiveTabCell: UICollectionViewCell, ReusableCell {
 //    func applyTheme(_ theme: Theme) {
 //        backgroundColor = .clear
 //        tableView.backgroundColor = .clear
-////        containerView.backgroundColor = theme.colors.layer5
+//        containerView.backgroundColor = theme.colors.layer5
 //        tableView.reloadData()
 //    }
 //}

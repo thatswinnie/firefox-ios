@@ -24,7 +24,6 @@ class GridTabViewControllerLayout: UICollectionViewCompositionalLayout {
             } else {
                 allAttributes.append(attribute)
             }
-
         }
 
         return allAttributes

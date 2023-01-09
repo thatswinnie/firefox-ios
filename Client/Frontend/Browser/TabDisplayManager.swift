@@ -605,7 +605,6 @@ extension TabDisplayManager: UICollectionViewDataSource {
                 for: indexPath) as? InactiveTabItemCell,
                 let tab = inactiveViewModel?.inactiveTabs[indexPath.item] {
                 let viewModel = InactiveTabItemCellModel(title: tab.getTabTrayTitle(),
-                                                         icon: tab.displayFavicon,
                                                          website: getTabDomainUrl(tab: tab))
 //                inactiveCell.applyTheme(theme)
                 inactiveCell.configureCell(viewModel: viewModel)
