@@ -555,15 +555,18 @@ extension TabDisplayManager: UICollectionViewDataSource {
 //                delegate?.setupCFR(with: headerView.titleLabel)
                 return view
             } else if kind == UICollectionView.elementKindSectionFooter,
+                      isInactiveViewExpanded,
                       let view = collectionView.dequeueReusableSupplementaryView(
                        ofKind: UICollectionView.elementKindSectionFooter,
                        withReuseIdentifier: CellWithRoundedButton.cellIdentifier,
                        for: indexPath) as? CellWithRoundedButton {
-                view.isHidden = !isInactiveViewExpanded
                 return view
             }
 
-            return UICollectionReusableView()
+            return collectionView.dequeueReusableSupplementaryView(
+                ofKind: UICollectionView.elementKindSectionFooter,
+                withReuseIdentifier: "default",
+                for: indexPath)
 
         default:
             if let view = collectionView.dequeueReusableSupplementaryView(
@@ -750,17 +753,6 @@ extension TabDisplayManager: InactiveTabsDelegate {
             ofKind: UICollectionView.elementKindSectionHeader,
             at: indexPath),
             let layout = collectionView.collectionViewLayout as? UICollectionViewCompositionalLayout {
-//
-//            NSIndexPath *indexPath = ... // indexPath of your header, item must be 0
-//
-//            CGFloat offsetY = [collectionView layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:indexPath].frame.origin.y;
-//
-//            CGFloat contentInsetY = self.contentInset.top;
-//            CGFloat sectionInsetY = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).sectionInset.top;
-//
-//            [collectionView setContentOffset:CGPointMake(collectionView.contentOffset.x, offsetY - contentInsetY - sectionInsetY) animated:YES];
-
-//            let sectionInsetY = collectionView.collectionViewLayout.sectionInset.top
             let sectionInsetY = layout.configuration.interSectionSpacing
             let point = CGPoint(x: 0,
                                 y: attributes.frame.origin.y - collectionView.contentInset.top - sectionInsetY)

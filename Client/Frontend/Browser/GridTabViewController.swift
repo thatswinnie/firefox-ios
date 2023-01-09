@@ -197,6 +197,10 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
             CellWithRoundedButton.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
             withReuseIdentifier: CellWithRoundedButton.cellIdentifier)
+        collectionView.register(
+            UICollectionReusableView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: "default") // cell used if anything goes wrong so we don't crash
 
         tabDisplayManager = TabDisplayManager(collectionView: self.collectionView,
                                               tabManager: self.tabManager,
@@ -292,7 +296,8 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
             alignment: .bottom
         )
 
-        section.boundarySupplementaryItems = [sectionHeader, sectionFooter]
+        section.boundarySupplementaryItems = tabDisplayManager.isInactiveViewExpanded ?
+            [sectionHeader, sectionFooter] : [sectionHeader]
 
         let backgroundItem = NSCollectionLayoutDecorationItem.background(
             elementKind: InactiveTabCellBackgroundView.cellIdentifier)

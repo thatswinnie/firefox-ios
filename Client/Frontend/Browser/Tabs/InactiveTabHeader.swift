@@ -26,14 +26,6 @@ class InactiveTabHeader: UICollectionReusableView, NotificationThemeable, Reusab
             size: 17)
     }
 
-//    static var height: CGFloat {
-//        let height = "Sample".boundingRectWithSize(CGSizeMake(CGFloat.max, UIScreen.mainScreen().bounds.size.width),
-//                                                   options: .UsesLineFragmentOrigin,
-//                                                   attributes: [NSFontAttributeName: UX.font],
-//                                                   context: nil).size.height
-//        return max(InactiveTabCell.UX.HeaderAndRowHeight, height)
-//    }
-
     var state: ExpandButtonState? {
         willSet(state) {
             moreButton.setImage(state?.image, for: .normal)

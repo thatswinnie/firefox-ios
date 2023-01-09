@@ -46,7 +46,7 @@ class InactiveTabItemCell: UICollectionViewCell, NotificationThemeable, Reusable
 
         titleLabel.text = viewModel.title
         titleLabel.font = viewModel.fontForLabel
-        
+
         if let urlString = viewModel.website?.absoluteString {
             let cornerRadius = InactiveTabItemCellModel.UX.FaviconCornerRadius
             leftImageView.setFavicon(FaviconImageViewModel(urlStringRequest: urlString,
