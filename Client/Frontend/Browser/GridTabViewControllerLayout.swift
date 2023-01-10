@@ -10,7 +10,6 @@ class GridTabViewControllerLayout: UICollectionViewCompositionalLayout {
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         guard let attributes = super.layoutAttributesForElements(in: rect) else { return nil }
         var allAttributes = [UICollectionViewLayoutAttributes]()
-        print("WT: \(attributes)")
 
         for attribute in attributes {
             if attribute.representedElementCategory == UICollectionView.ElementCategory.decorationView {

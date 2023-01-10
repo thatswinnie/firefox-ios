@@ -169,7 +169,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            
+
             emptyPrivateTabsView.topAnchor.constraint(equalTo: collectionView.topAnchor),
             emptyPrivateTabsView.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor),
             emptyPrivateTabsView.leadingAnchor.constraint(equalTo: collectionView.leadingAnchor),
@@ -277,13 +277,12 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
-            alignment: .top,
-            absoluteOffset: CGPoint(x: 0, y: verticalContentInset)
+            alignment: .top
         )
-//        sectionHeader.contentInsets = NSDirectionalEdgeInsets(top: verticalContentInset,
-//                                                              leading: 0,
-//                                                              bottom: 0,
-//                                                              trailing: 0)
+        sectionHeader.contentInsets = NSDirectionalEdgeInsets(top: verticalContentInset,
+                                                              leading: 0,
+                                                              bottom: 0,
+                                                              trailing: 0)
 
         guard tabDisplayManager.shouldEnableInactiveTabs, !tabDisplayManager.isPrivate else {
             return section
@@ -304,7 +303,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
         let backgroundItem = NSCollectionLayoutDecorationItem.background(
             elementKind: InactiveTabCellBackgroundView.cellIdentifier)
-//        backgroundItem.contentInsets = section.contentInsets
+        backgroundItem.contentInsets = section.contentInsets
         section.decorationItems = [backgroundItem]
 
         return section
