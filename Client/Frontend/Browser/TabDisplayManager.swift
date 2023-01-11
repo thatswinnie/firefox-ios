@@ -560,6 +560,9 @@ extension TabDisplayManager: UICollectionViewDataSource {
                        ofKind: UICollectionView.elementKindSectionFooter,
                        withReuseIdentifier: CellWithRoundedButton.cellIdentifier,
                        for: indexPath) as? CellWithRoundedButton {
+                view.buttonClosure = {
+                    self.didTapCloseAllTabs()
+                }
                 return view
             }
 
