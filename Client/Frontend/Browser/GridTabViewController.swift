@@ -7,20 +7,6 @@ import Storage
 import Shared
 import Common
 
-struct GridTabTrayControllerUX {
-    static let CornerRadius = CGFloat(6.0)
-    static let TextBoxHeight = CGFloat(32.0)
-    static let FaviconSize = CGFloat(20)
-    static let Margin = CGFloat(15)
-    static let ToolbarButtonOffset = CGFloat(10.0)
-    static let CloseButtonSize = CGFloat(32)
-    static let CloseButtonMargin = CGFloat(6.0)
-    static let CloseButtonEdgeInset = CGFloat(7)
-    static let NumberOfColumnsWide = 3
-    static let CompactNumberOfColumnsThin = 2
-    static let MenuFixedWidth: CGFloat = 320
-}
-
 protocol TabTrayDelegate: AnyObject {
     func tabTrayDidDismiss(_ tabTray: GridTabViewController)
     func tabTrayDidAddTab(_ tabTray: GridTabViewController, tab: Tab)
@@ -31,6 +17,14 @@ protocol TabTrayDelegate: AnyObject {
 }
 
 class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
+    struct UX {
+        static let cornerRadius: CGFloat = 6.0
+        static let margin: CGFloat = 15.0
+        static let compactNumberOfColumnsThin: Int = 2
+        static let numberOfColumnsWide: Int = 3
+        static let textBoxHeight: CGFloat = 32.0
+    }
+
     let tabManager: TabManager
     let profile: Profile
     weak var delegate: TabTrayDelegate?
@@ -237,7 +231,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
     private func inactiveTabSectionLayout(availableWidth: CGFloat) -> NSCollectionLayoutSection {
         let frameWidth = collectionView.frame.size.width
-        let margin = GridTabTrayControllerUX.Margin
+        let margin = UX.margin
         var cellWidth = (frameWidth - margin * 2) > 0 ? frameWidth - margin * 2 : 0
         let estimatedHeight = tabLayoutDelegate.calculateInactiveTabSizeHelper(collectionView).height
 
@@ -310,7 +304,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
 
     private func groupedTabSectionLayout() -> NSCollectionLayoutSection {
         let frameWidth = collectionView.frame.size.width
-        let margin = GridTabTrayControllerUX.Margin
+        let margin = UX.margin
         let cellWidth = frameWidth > 0 ? frameWidth : 0
         var cellHeight: CGFloat = 0
 
@@ -343,7 +337,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
     }
 
     private func regularTabSectionLayout() -> NSCollectionLayoutSection {
-        let margin = GridTabTrayControllerUX.Margin * CGFloat(numberOfColumns + 1)
+        let margin = UX.margin * CGFloat(numberOfColumns + 1)
         let calculatedWidth = collectionView.bounds.width - collectionView.safeAreaInsets.left - collectionView.safeAreaInsets.right - margin
         let cellWidth = floor(calculatedWidth / CGFloat(numberOfColumns))
         let cellHeight = tabLayoutDelegate.cellHeightForCurrentDevice()
@@ -359,7 +353,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         let subItems: [NSCollectionLayoutItem] = Array(repeating: item, count: Int(subitemsCount))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
                                                        subitems: subItems)
-        group.interItemSpacing = .fixed(GridTabTrayControllerUX.Margin)
+        group.interItemSpacing = .fixed(UX.margin)
 
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -378,11 +372,11 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
         }
 
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: GridTabTrayControllerUX.Margin,
-            leading: GridTabTrayControllerUX.Margin + collectionView.safeAreaInsets.left,
-            bottom: GridTabTrayControllerUX.Margin,
-            trailing: GridTabTrayControllerUX.Margin + collectionView.safeAreaInsets.right)
-        section.interGroupSpacing = GridTabTrayControllerUX.Margin
+            top: UX.margin,
+            leading: UX.margin + collectionView.safeAreaInsets.left,
+            bottom: UX.margin,
+            trailing: UX.margin + collectionView.safeAreaInsets.right)
+        section.interGroupSpacing = UX.margin
         return section
     }
 
@@ -803,9 +797,9 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout, U
     fileprivate var numberOfColumns: Int {
         // iPhone 4-6+ portrait
         if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
-            return GridTabTrayControllerUX.CompactNumberOfColumnsThin
+            return GridTabViewController.UX.compactNumberOfColumnsThin
         } else {
-            return GridTabTrayControllerUX.NumberOfColumnsWide
+            return GridTabViewController.UX.numberOfColumnsWide
         }
     }
 
@@ -817,14 +811,14 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout, U
     }
 
     fileprivate func cellHeightForCurrentDevice() -> CGFloat {
-        let shortHeight = GridTabTrayControllerUX.TextBoxHeight * 6
+        let shortHeight = GridTabViewController.UX.textBoxHeight * 6
 
         if self.traitCollection.verticalSizeClass == .compact {
             return shortHeight
         } else if self.traitCollection.horizontalSizeClass == .compact {
             return shortHeight
         } else {
-            return GridTabTrayControllerUX.TextBoxHeight * 8
+            return GridTabViewController.UX.textBoxHeight * 8
         }
     }
 

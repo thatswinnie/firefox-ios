@@ -21,6 +21,12 @@ class TabCell: UICollectionViewCell,
                TabTrayCell,
                ReusableCell,
                ThemeApplicable {
+    struct UX {
+        static let faviconSize: CGFloat = 20
+        static let closeButtonSize: CGFloat = 32
+        static let closeButtonEdgeInset: CGFloat = 7
+    }
+
     // MARK: - Constants
     enum Style {
         case light
@@ -31,7 +37,7 @@ class TabCell: UICollectionViewCell,
 
     // MARK: - UI Vars
     lazy var backgroundHolder: UIView = .build { view in
-        view.layer.cornerRadius = GridTabTrayControllerUX.CornerRadius
+        view.layer.cornerRadius = GridTabViewController.UX.cornerRadius
         view.clipsToBounds = true
     }
 
@@ -61,7 +67,7 @@ class TabCell: UICollectionViewCell,
         button.setImage(UIImage.templateImageNamed("tab_close"), for: [])
         button.imageView?.contentMode = .scaleAspectFit
         button.contentMode = .center
-        button.imageEdgeInsets = UIEdgeInsets(equalInset: GridTabTrayControllerUX.CloseButtonEdgeInset)
+        button.imageEdgeInsets = UIEdgeInsets(equalInset: UX.closeButtonEdgeInset)
     }
 
     // TODO: Handle visual effects theming FXIOS-5064
@@ -109,15 +115,16 @@ class TabCell: UICollectionViewCell,
             title.topAnchor.constraint(equalTo: backgroundHolder.topAnchor),
             title.leftAnchor.constraint(equalTo: backgroundHolder.leftAnchor),
             title.rightAnchor.constraint(equalTo: backgroundHolder.rightAnchor),
-            title.heightAnchor.constraint(equalToConstant: GridTabTrayControllerUX.TextBoxHeight),
+            title.heightAnchor.constraint(equalToConstant: GridTabViewController.UX.textBoxHeight),
 
             favicon.leadingAnchor.constraint(equalTo: title.leadingAnchor, constant: 6),
-            favicon.topAnchor.constraint(equalTo: title.topAnchor, constant: (GridTabTrayControllerUX.TextBoxHeight - GridTabTrayControllerUX.FaviconSize) / 2),
-            favicon.heightAnchor.constraint(equalToConstant: GridTabTrayControllerUX.FaviconSize),
-            favicon.widthAnchor.constraint(equalToConstant: GridTabTrayControllerUX.FaviconSize),
+            favicon.topAnchor.constraint(equalTo: title.topAnchor,
+                                         constant: (GridTabViewController.UX.textBoxHeight - UX.faviconSize) / 2),
+            favicon.heightAnchor.constraint(equalToConstant: UX.faviconSize),
+            favicon.widthAnchor.constraint(equalToConstant: UX.faviconSize),
 
-            closeButton.heightAnchor.constraint(equalToConstant: GridTabTrayControllerUX.CloseButtonSize),
-            closeButton.widthAnchor.constraint(equalToConstant: GridTabTrayControllerUX.CloseButtonSize),
+            closeButton.heightAnchor.constraint(equalToConstant: UX.closeButtonSize),
+            closeButton.widthAnchor.constraint(equalToConstant: UX.closeButtonSize),
             closeButton.centerYAnchor.constraint(equalTo: title.contentView.centerYAnchor),
             closeButton.trailingAnchor.constraint(equalTo: title.trailingAnchor),
 
@@ -149,7 +156,7 @@ class TabCell: UICollectionViewCell,
     override func layoutSubviews() {
         super.layoutSubviews()
         let shadowPath = CGRect(width: layer.frame.width + (TabCell.borderWidth * 2), height: layer.frame.height + (TabCell.borderWidth * 2))
-        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: GridTabTrayControllerUX.CornerRadius+TabCell.borderWidth).cgPath
+        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: GridTabViewController.UX.cornerRadius + TabCell.borderWidth).cgPath
     }
 
     // MARK: - Configure tab cell with a Tab
@@ -250,7 +257,7 @@ class TabCell: UICollectionViewCell,
         // create a frame that is "BorderWidth" size bigger than the cell
         layer.shadowOffset = CGSize(width: -TabCell.borderWidth, height: -TabCell.borderWidth)
         let shadowPath = CGRect(width: layer.frame.width + (TabCell.borderWidth * 2), height: layer.frame.height + (TabCell.borderWidth * 2))
-        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: GridTabTrayControllerUX.CornerRadius+TabCell.borderWidth).cgPath
+        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: GridTabViewController.UX.cornerRadius + TabCell.borderWidth).cgPath
     }
 }
 
