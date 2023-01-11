@@ -284,7 +284,7 @@ class GridTabViewController: UIViewController, TabTrayViewDelegate, Themeable {
                                                               bottom: 0,
                                                               trailing: 0)
 
-        guard tabDisplayManager.shouldEnableInactiveTabs, !tabDisplayManager.isPrivate else {
+        guard tabDisplayManager.hasInactiveTabs else {
             return section
         }
 

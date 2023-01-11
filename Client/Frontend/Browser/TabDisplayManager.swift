@@ -94,6 +94,12 @@ class TabDisplayManager: NSObject, FeatureFlaggable {
         return featureFlags.isFeatureEnabled(.inactiveTabs, checking: .buildAndUser)
     }
 
+    var hasInactiveTabs: Bool {
+        return shouldEnableInactiveTabs &&
+        !isPrivate &&
+        !(inactiveViewModel?.inactiveTabs.isEmpty ?? true)
+    }
+
     var orderedTabs: [Tab] {
         return filteredTabs
     }
