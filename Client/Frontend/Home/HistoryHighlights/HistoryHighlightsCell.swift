@@ -186,10 +186,10 @@ extension HistoryHighlightsCell: Blurrable {
             contentView.layer.cornerRadius = HomepageViewModel.UX.generalCornerRadius
         } else {
             contentView.removeVisualEffectView()
-            contentView.backgroundColor = theme.colors.layer5
-            setupShadow(cellModel?.shouldAddShadow ?? false,
-                        cornersToRound: cellModel?.corners,
-                        theme: theme)
+//            contentView.backgroundColor = theme.colors.layer5
+//            setupShadow(cellModel?.shouldAddShadow ?? false,
+//                        cornersToRound: cellModel?.corners,
+//                        theme: theme)
         }
     }
 }

@@ -195,6 +195,9 @@ class HomepageViewController: UIViewController, HomePanel, FeatureFlaggable, The
         collectionView.register(LabelButtonHeaderView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: LabelButtonHeaderView.cellIdentifier)
+        collectionView.register(HistoryHighlightsBackgroundView.self,
+                                forSupplementaryViewOfKind: HistoryHighlightsViewModel.UX.backgroundKind,
+                                withReuseIdentifier: HistoryHighlightsBackgroundView.cellIdentifier)
 
         collectionView.keyboardDismissMode = .onDrag
         collectionView.addGestureRecognizer(longPressRecognizer)
@@ -466,29 +469,23 @@ class HomepageViewController: UIViewController, HomePanel, FeatureFlaggable, The
 // MARK: - CollectionView Data Source
 
 extension HomepageViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader,
-              let headerView = collectionView.dequeueReusableSupplementaryView(
-                ofKind: UICollectionView.elementKindSectionHeader,
-                withReuseIdentifier: LabelButtonHeaderView.cellIdentifier,
-                for: indexPath) as? LabelButtonHeaderView,
-              let sectionViewModel = viewModel.getSectionViewModel(shownSection: indexPath.section)
-        else { return UICollectionReusableView() }
-
-        // Configure header only if section is shown
-        let headerViewModel = sectionViewModel.shouldShow ? sectionViewModel.headerViewModel : LabelButtonHeaderViewModel.emptyHeader
-        headerView.configure(viewModel: headerViewModel, theme: themeManager.currentTheme)
-
-        // Jump back in header specific setup
-        if sectionViewModel.sectionType == .jumpBackIn {
-            self.viewModel.jumpBackInViewModel.sendImpressionTelemetry()
-            // Moving called after header view gets configured
-            // and delaying to wait for header view layout readjust
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                self?.prepareJumpBackInContextualHint(onView: headerView)
-            }
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            return createSectionHeader(kind, at: indexPath)
+        case HistoryHighlightsViewModel.UX.backgroundKind:
+            guard let backgroundView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: HistoryHighlightsBackgroundView.cellIdentifier,
+                for: indexPath) as? HistoryHighlightsBackgroundView
+            else { return UICollectionReusableView() }
+            return backgroundView
+        default:
+            return UICollectionReusableView()
         }
-        return headerView
     }
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -510,6 +507,30 @@ extension HomepageViewController: UICollectionViewDelegate, UICollectionViewData
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let viewModel = viewModel.getSectionViewModel(shownSection: indexPath.section) as? HomepageSectionHandler else { return }
         viewModel.didSelectItem(at: indexPath, homePanelDelegate: homePanelDelegate, libraryPanelDelegate: libraryPanelDelegate)
+    }
+
+    private func createSectionHeader(_ kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: LabelButtonHeaderView.cellIdentifier,
+                for: indexPath) as? LabelButtonHeaderView,
+              let sectionViewModel = viewModel.getSectionViewModel(shownSection: indexPath.section)
+        else { return UICollectionReusableView() }
+
+        // Configure header only if section is shown
+        let headerViewModel = sectionViewModel.shouldShow ? sectionViewModel.headerViewModel : LabelButtonHeaderViewModel.emptyHeader
+        headerView.configure(viewModel: headerViewModel, theme: themeManager.currentTheme)
+
+        // Jump back in header specific setup
+        if sectionViewModel.sectionType == .jumpBackIn {
+            self.viewModel.jumpBackInViewModel.sendImpressionTelemetry()
+            // Moving called after header view gets configured
+            // and delaying to wait for header view layout readjust
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.prepareJumpBackInContextualHint(onView: headerView)
+            }
+        }
+        return headerView
     }
 }
 

@@ -60,6 +60,7 @@ class HistoryHighlightsViewModel {
         static let estimatedCellHeight: CGFloat = 65
         static let verticalPadding: CGFloat = 8
         static let horizontalPadding: CGFloat = 16
+        static let backgroundKind = "background-element-kind"
     }
 
     // MARK: - Properties & Variables
@@ -184,9 +185,18 @@ extension HistoryHighlightsViewModel: HomepageViewModelProtocol, FeatureFlaggabl
     }
 
     func section(for traitCollection: UITraitCollection, size: CGSize) -> NSCollectionLayoutSection {
+        let backgroundSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                    heightDimension: .estimated(34))
+        let backgroundItem = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: backgroundSize,
+            elementKind: HistoryHighlightsViewModel.UX.backgroundKind,
+            containerAnchor: NSCollectionLayoutAnchor(edges: .top))
+        backgroundItem.zIndex = -1
+
         let item = NSCollectionLayoutItem(
             layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                               heightDimension: .estimated(UX.estimatedCellHeight))
+                                               heightDimension: .estimated(UX.estimatedCellHeight)),
+            supplementaryItems: [backgroundItem]
         )
 
         let groupWidth = groupWidthWeight
