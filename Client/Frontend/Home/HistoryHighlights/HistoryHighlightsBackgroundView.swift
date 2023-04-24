@@ -4,11 +4,12 @@
 
 import Foundation
 
-//class HistoryHighlightsBackgroundLayoutAttributes: UICollectionViewLayoutAttributes {
+// class HistoryHighlightsBackgroundLayoutAttributes: UICollectionViewLayoutAttributes {
 //    var backgroundColor: UIColor = .clear
-//}
+// }
 
 class HistoryHighlightsBackgroundView: UICollectionReusableView, ReusableCell {
+    static let elementKind = "history-highlights-element-kind"
     private let roundedView: UIView = .build { view in
         view.layer.cornerRadius = 15
         view.backgroundColor = .white
@@ -45,7 +46,7 @@ class HistoryHighlightsBackgroundView: UICollectionReusableView, ReusableCell {
         roundedView.layer.cornerRadius = HomepageViewModel.UX.generalCornerRadius
         roundedView.layer.shadowPath = UIBezierPath(roundedRect: roundedView.bounds,
                                                     cornerRadius: HomepageViewModel.UX.generalCornerRadius).cgPath
-        roundedView.layer.shadowColor = UIColor(rgb: 0x3a3944).withAlphaComponent(0.16).cgColor //theme.colors.shadowDefault.cgColor
+        roundedView.layer.shadowColor = UIColor(rgb: 0x3a3944).withAlphaComponent(0.16).cgColor // theme.colors.shadowDefault.cgColor
         roundedView.layer.shadowOpacity = HomepageViewModel.UX.shadowOpacity
         roundedView.layer.shadowOffset = HomepageViewModel.UX.shadowOffset
         roundedView.layer.shadowRadius = HomepageViewModel.UX.shadowRadius

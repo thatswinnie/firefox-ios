@@ -195,10 +195,9 @@ class HomepageViewController: UIViewController, HomePanel, FeatureFlaggable, The
         collectionView.register(LabelButtonHeaderView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: LabelButtonHeaderView.cellIdentifier)
-        // Laurie - to clean up
-        collectionView.register(BadgeSupplementaryView.self,
-                                forSupplementaryViewOfKind: BadgeSupplementaryView.elementKind,
-                                withReuseIdentifier: BadgeSupplementaryView.reuseIdentifier)
+        collectionView.register(HistoryHighlightsBackgroundView.self,
+                                forSupplementaryViewOfKind: HistoryHighlightsBackgroundView.elementKind,
+                                withReuseIdentifier: HistoryHighlightsBackgroundView.cellIdentifier)
 
         collectionView.keyboardDismissMode = .onDrag
         collectionView.addGestureRecognizer(longPressRecognizer)
@@ -474,16 +473,14 @@ extension HomepageViewController: UICollectionViewDelegate, UICollectionViewData
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath
     ) -> UICollectionReusableView {
-        // Laurie - to clean up
-        print("Laurie - Element kind \(kind)")
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             return createSectionHeader(kind, at: indexPath)
-        case BadgeSupplementaryView.elementKind:
+        case HistoryHighlightsBackgroundView.elementKind:
             guard let backgroundView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: BadgeSupplementaryView.reuseIdentifier,
-                for: indexPath) as? BadgeSupplementaryView
+                withReuseIdentifier: HistoryHighlightsBackgroundView.cellIdentifier,
+                for: indexPath) as? HistoryHighlightsBackgroundView
             else {
                 return UICollectionReusableView()
             }

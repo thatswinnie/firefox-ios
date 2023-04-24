@@ -60,7 +60,6 @@ class HistoryHighlightsViewModel {
         static let estimatedCellHeight: CGFloat = 65
         static let verticalPadding: CGFloat = 8
         static let horizontalPadding: CGFloat = 16
-        static let backgroundKind = "background-element-kind"
     }
 
     // MARK: - Properties & Variables
@@ -184,36 +183,22 @@ extension HistoryHighlightsViewModel: HomepageViewModelProtocol, FeatureFlaggabl
         return !isPrivate
     }
 
-    // Laurie - to clean up
     func section(for traitCollection: UITraitCollection, size: CGSize) -> NSCollectionLayoutSection {
-        let badgeAnchor = NSCollectionLayoutAnchor(edges: [.top, .trailing], fractionalOffset: CGPoint(x: 0.3, y: -0.3))
-        let badgeSize = NSCollectionLayoutSize(widthDimension: .absolute(20),
-                                               heightDimension: .absolute(20))
-        let badge = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: badgeSize,
-            elementKind: BadgeSupplementaryView.elementKind,
-            containerAnchor: badgeAnchor)
+        let backgroundAnchor = NSCollectionLayoutAnchor(edges: .top)
+        let backgroundSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                    heightDimension: .estimated(34))
+        let backgroundItem = NSCollectionLayoutSupplementaryItem(
+            layoutSize: backgroundSize,
+            elementKind: HistoryHighlightsBackgroundView.elementKind,
+            containerAnchor: backgroundAnchor)
+        backgroundItem.zIndex = -1
 
-//        let anchor = NSCollectionLayoutAnchor(edges: [.top, .trailing],
-//                                              fractionalOffset: CGPoint(x: 0.3, y: -0.3))
-//        let backgroundSize = NSCollectionLayoutSize(widthDimension: .absolute(20),
-//                                                    heightDimension: .absolute(20))
-//        let backgroundItem = NSCollectionLayoutSupplementaryItem(
-//            layoutSize: backgroundSize,
-//            elementKind: HistoryHighlightsViewModel.UX.backgroundKind,
-//            containerAnchor: anchor)
-//
-////            NSCollectionLayoutBoundarySupplementaryItem(
-////            layoutSize: backgroundSize,
-////            elementKind: HistoryHighlightsViewModel.UX.backgroundKind,
-////            containerAnchor: NSCollectionLayoutAnchor(edges: .top))
-////        backgroundItem.zIndex = -1
-//
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                               heightDimension: .estimated(UX.estimatedCellHeight))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize, supplementaryItems: [badge])
+        let item = NSCollectionLayoutItem(layoutSize: itemSize, supplementaryItems: [backgroundItem])
 
         let groupWidth = groupWidthWeight
+        // TODO: Winnie - Next is to figure out the layout since it seems we can't use Array(repeating: 🙃
 //        let subItems = Array(repeating: item, count: numberOfRows)
         let groupSize = NSCollectionLayoutSize(widthDimension: groupWidth,
                                                heightDimension: .estimated(UX.estimatedCellHeight))
@@ -473,55 +458,5 @@ extension HistoryHighlightsViewModel: HistoryHighlightsDelegate {
             guard self.isEnabled else { return }
             self.delegate?.reloadView()
         }
-    }
-}
-
-// Laurie - To remove, just figuring things out
-class BadgeSupplementaryView: UICollectionReusableView {
-    static let elementKind = "badge-element-kind"
-    static let reuseIdentifier = "badge-reuse-identifier"
-    let label = UILabel()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        configure()
-    }
-
-    override var frame: CGRect {
-        didSet {
-            configureBorder()
-        }
-    }
-    override var bounds: CGRect {
-        didSet {
-            configureBorder()
-        }
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("Not implemented")
-    }
-}
-
-extension BadgeSupplementaryView {
-    func configure() {
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.adjustsFontForContentSizeCategory = true
-        addSubview(label)
-        NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: centerYAnchor)
-        ])
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.textAlignment = .center
-        label.textColor = .black
-        backgroundColor = .green
-        configureBorder()
-    }
-    func configureBorder() {
-        let radius = bounds.width / 2.0
-        layer.cornerRadius = radius
-        layer.borderColor = UIColor.black.cgColor
-        layer.borderWidth = 1.0
     }
 }
