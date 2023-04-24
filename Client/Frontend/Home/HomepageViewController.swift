@@ -195,9 +195,10 @@ class HomepageViewController: UIViewController, HomePanel, FeatureFlaggable, The
         collectionView.register(LabelButtonHeaderView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: LabelButtonHeaderView.cellIdentifier)
-        collectionView.register(HistoryHighlightsBackgroundView.self,
-                                forSupplementaryViewOfKind: HistoryHighlightsViewModel.UX.backgroundKind,
-                                withReuseIdentifier: HistoryHighlightsBackgroundView.cellIdentifier)
+        // Laurie - to clean up
+        collectionView.register(BadgeSupplementaryView.self,
+                                forSupplementaryViewOfKind: BadgeSupplementaryView.elementKind,
+                                withReuseIdentifier: BadgeSupplementaryView.reuseIdentifier)
 
         collectionView.keyboardDismissMode = .onDrag
         collectionView.addGestureRecognizer(longPressRecognizer)
@@ -473,15 +474,19 @@ extension HomepageViewController: UICollectionViewDelegate, UICollectionViewData
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath
     ) -> UICollectionReusableView {
+        // Laurie - to clean up
+        print("Laurie - Element kind \(kind)")
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             return createSectionHeader(kind, at: indexPath)
-        case HistoryHighlightsViewModel.UX.backgroundKind:
+        case BadgeSupplementaryView.elementKind:
             guard let backgroundView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: HistoryHighlightsBackgroundView.cellIdentifier,
-                for: indexPath) as? HistoryHighlightsBackgroundView
-            else { return UICollectionReusableView() }
+                withReuseIdentifier: BadgeSupplementaryView.reuseIdentifier,
+                for: indexPath) as? BadgeSupplementaryView
+            else {
+                return UICollectionReusableView()
+            }
             return backgroundView
         default:
             return UICollectionReusableView()
